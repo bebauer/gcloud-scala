@@ -8,6 +8,7 @@ object Dependencies {
   lazy val GrpcAuth           = "io.grpc"                % "grpc-auth"                       % com.trueaccord.scalapb.compiler.Version.grpcJavaVersion
   lazy val GoogleOauth2       = "com.google.auth"        % "google-auth-library-oauth2-http" % "0.8.0"
   lazy val Slf4jApi           = "org.slf4j"              % "slf4j-api"                       % "1.7.25"
+  lazy val LogbackClassic     = "ch.qos.logback"         % "logback-classic"                 % "1.2.1"
 
   lazy val proto = Seq(
     ScalapbRuntime % "protobuf",
@@ -23,6 +24,7 @@ object Dependencies {
 
   lazy val pubSubTestKit = Seq(
     ScalaTest,
-    Slf4jApi
+    Slf4jApi,
+    LogbackClassic % Test
   )
 }
