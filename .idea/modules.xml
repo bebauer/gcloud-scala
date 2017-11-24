@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gcloud-scala.iml" filepath="$PROJECT_DIR$/.idea/modules/gcloud-scala.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gcloud-scala-build.iml" filepath="$PROJECT_DIR$/.idea/modules/gcloud-scala-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gcloud-scala-proto.iml" filepath="$PROJECT_DIR$/.idea/modules/gcloud-scala-proto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gcloud-scala-proto-build.iml" filepath="$PROJECT_DIR$/.idea/modules/gcloud-scala-proto-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gcloud-scala-pubsub.iml" filepath="$PROJECT_DIR$/.idea/modules/gcloud-scala-pubsub.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gcloud-scala-pubsub-build.iml" filepath="$PROJECT_DIR$/.idea/modules/gcloud-scala-pubsub-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gcloud-scala-pubsub-testkit.iml" filepath="$PROJECT_DIR$/.idea/modules/gcloud-scala-pubsub-testkit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gcloud-scala-pubsub-testkit-build.iml" filepath="$PROJECT_DIR$/.idea/modules/gcloud-scala-pubsub-testkit-build.iml" />
+    </modules>
+  </component>
+</project>
