@@ -93,3 +93,4 @@ fabric.properties
 *.class
 *.log
 
+*-account.json
