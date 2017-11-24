@@ -14,6 +14,7 @@ cache:
 
 env:
   - PATH=$PATH:${HOME}/google-cloud-sdk/bin
+  - GOOGLE_APPLICATION_CREDENTIALS=${TRAVIS_BUILD_DIR}/gcloud-account.json
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_c3e85ceadb2f_key -iv $encrypted_c3e85ceadb2f_iv -in gcloud-account.json.enc -out gcloud-account.json -d
