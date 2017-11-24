@@ -16,7 +16,7 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_c3e85ceadb2f_key -iv $encrypted_c3e85ceadb2f_iv -in gcloud-account.json.enc -out gcloud-account.json -d
   - if [ ! -d ${HOME}/google-cloud-sdk ]; then
        curl https://sdk.cloud.google.com | bash;
-       gcloud -q components install pubsub-emulator
+       gcloud -q components install pubsub-emulator;
     fi
   - gcloud auth activate-service-account --key-file gcloud-account.json
 
