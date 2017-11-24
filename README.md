@@ -1,6 +1,8 @@
 gcloud scala
 ============
 
+[![Build Status](https://travis-ci.org/bebauer/gcloud-scala.svg?branch=master)](https://travis-ci.org/bebauer/gcloud-scala)
+
 **gcloud scala** provides scala libraries for google cloud applications.
 
 # Features
