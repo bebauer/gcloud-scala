@@ -22,6 +22,8 @@ before_install:
        curl https://sdk.cloud.google.com | bash;
        gcloud -q components install pubsub-emulator;
        echo "here2";
+    else
+      echo "else!!!";
     fi
   - gcloud auth activate-service-account --key-file gcloud-account.json
 
