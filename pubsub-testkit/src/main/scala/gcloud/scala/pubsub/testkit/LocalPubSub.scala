@@ -35,7 +35,7 @@ trait LocalPubSub extends BeforeAndAfterAll with Eventually with Matchers {
   override protected def beforeAll(): Unit = {
     logger.info("Starting pubsub emulator")
 
-    localPubSub = Process(s"gcloud beta emulators pubsub start").run(
+    localPubSub = Process(s"gcloud -q beta emulators pubsub start").run(
       ProcessLogger(
         line => {
           logger.debug(line)
