@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="gcloud-scala-pubsub-testkit-build" external.linked.project.path="$MODULE_DIR$/../../pubsub-testkit/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLARfe11b6d74466e8827c0d.fetchProtos, SUB:DOLLARfe11b6d74466e8827c0d.gcloudSUB:DOLLARminusscala, SUB:DOLLARfe11b6d74466e8827c0d.gcloudSUB:DOLLARminusscalaSUB:DOLLARminusproto, SUB:DOLLARfe11b6d74466e8827c0d.gcloudSUB:DOLLARminusscalaSUB:DOLLARminuspubsub, SUB:DOLLARfe11b6d74466e8827c0d.gcloudSUB:DOLLARminusscalaSUB:DOLLARminuspubsubSUB:DOLLARminustestkit, _root_.sbt.Keys._, _root_.sbt._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.sbtprotoc.ProtocPlugin, _root_.org.jetbrains.sbt.IdeaShellPlugin, _root_.coursier.CoursierPlugin, _root_.sbtdynver.DynVerPlugin, _root_.org.jetbrains.sbt.StructurePlugin, _root_.sbtprotoc.ProtocPlugin.autoImport._, _root_.org.jetbrains.sbt.IdeaShellPlugin.autoImport._, _root_.coursier.CoursierPlugin.autoImport._, _root_.sbtdynver.DynVerPlugin.autoImport._, _root_.scala.xml.{TopScope=&gt;SUB:DOLLARscope}" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, file:/Users/bbauer/.sbt/preloaded/|maven|local-preloaded, /Users/bbauer/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
+<module external.linked.project.id="gcloud-scala-pubsub-testkit-build" external.linked.project.path="$MODULE_DIR$/../../pubsub-testkit/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLAR476347e0c768e8673353.fetchProtos, SUB:DOLLAR476347e0c768e8673353.gcloudSUB:DOLLARminusscala, SUB:DOLLAR476347e0c768e8673353.gcloudSUB:DOLLARminusscalaSUB:DOLLARminusproto, SUB:DOLLAR476347e0c768e8673353.gcloudSUB:DOLLARminusscalaSUB:DOLLARminuspubsub, SUB:DOLLAR476347e0c768e8673353.gcloudSUB:DOLLARminusscalaSUB:DOLLARminuspubsubSUB:DOLLARminustestkit, _root_.bintray.BintrayPlugin.autoImport._, _root_.sbtprotoc.ProtocPlugin.autoImport._, _root_.org.jetbrains.sbt.IdeaShellPlugin.autoImport._, _root_.coursier.CoursierPlugin.autoImport._, _root_.sbtdynver.DynVerPlugin.autoImport._, _root_.sbt.Keys._, _root_.sbt._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.bintray.BintrayPlugin, _root_.sbtprotoc.ProtocPlugin, _root_.org.jetbrains.sbt.IdeaShellPlugin, _root_.coursier.CoursierPlugin, _root_.sbtdynver.DynVerPlugin, _root_.org.jetbrains.sbt.StructurePlugin, _root_.scala.xml.{TopScope=&gt;SUB:DOLLARscope}" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, file:/Users/epyon/.sbt/preloaded/|maven|local-preloaded, https://dl.bintray.com/bebauer/maven/|maven|bintray-bebauer-maven, /Users/epyon/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../pubsub-testkit/project/target/idea-classes" />
     <output-test url="file://$MODULE_DIR$/../../pubsub-testkit/project/target/idea-test-classes" />
@@ -13,24 +13,37 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="gcloud-scala-build" />
     <orderEntry type="module-library">
-      <library name="SBT: sbt-and-plugins">
+      <library name="sbt: sbt-and-plugins">
         <CLASSES>
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.dwijnand/sbt-dynver/scala_2.12/sbt_1.0/2.0.0/jars/sbt-dynver.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.thesamet/sbt-protoc/scala_2.12/sbt_1.0/0.99.12/jars/sbt-protoc.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.foundweekends/sbt-bintray/scala_2.12/sbt_1.0/0.5.1/jars/sbt-bintray.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.jetbrains/sbt-idea-shell/scala_2.12/sbt_1.0/2017.2/jars/sbt-idea-shell.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.jetbrains/sbt-structure-extractor/scala_2.12/sbt_1.0/2017.2/jars/sbt-structure-extractor.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/github/os72/protoc-jar/3.4.0/protoc-jar-3.4.0.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.4.0/protobuf-java-3.4.0.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/ning/async-http-client/1.9.11/async-http-client-1.9.11.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thoughtworks/paranamer/paranamer/2.8/paranamer-2.8.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/trueaccord/scalapb/compilerplugin_2.12/0.6.6/compilerplugin_2.12-0.6.6.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/trueaccord/scalapb/protoc-bridge_2.12/0.3.0-M1/protoc-bridge_2.12-0.3.0-M1.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier-cache_2.12/1.0.0-RC13/coursier-cache_2.12-1.0.0-RC13.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier-extra_2.12/1.0.0-RC13/coursier-extra_2.12-1.0.0-RC13.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier_2.12/1.0.0-RC13/coursier_2.12-1.0.0-RC13.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/io/get-coursier/sbt-coursier_2.12_1.0/1.0.0-RC13/sbt-coursier-1.0.0-RC13.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/io/netty/netty/3.10.0.Final/netty-3.10.0.Final.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/net/databinder/dispatch/dispatch-core_2.12/0.12.0/dispatch-core_2.12-0.12.0.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/net/databinder/dispatch/dispatch-json4s-native_2.12/0.12.0/dispatch-json4s-native_2.12-0.12.0.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/foundweekends/bintry_2.12/0.5.1/bintry_2.12-0.5.1.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/json4s/json4s-ast_2.12/3.4.2/json4s-ast_2.12-3.4.2.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/json4s/json4s-core_2.12/3.4.2/json4s-core_2.12-3.4.2.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/json4s/json4s-native_2.12/3.4.2/json4s-native_2.12-3.4.2.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/json4s/json4s-scalap_2.12/3.4.2/json4s-scalap_2.12-3.4.2.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-concurrent_2.12/7.2.16/scalaz-concurrent_2.12-7.2.16.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-core_2.12/7.2.16/scalaz-core_2.12-7.2.16.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-effect_2.12/7.2.16/scalaz-effect_2.12-7.2.16.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-nop/1.7.7/slf4j-nop-1.7.7.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.4/lib/jline.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.4/lib/scala-compiler.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.4/lib/scala-library.jar!/" />
@@ -110,6 +123,7 @@
         <SOURCES>
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.dwijnand/sbt-dynver/scala_2.12/sbt_1.0/2.0.0/srcs/sbt-dynver-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.thesamet/sbt-protoc/scala_2.12/sbt_1.0/0.99.12/srcs/sbt-protoc-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.foundweekends/sbt-bintray/scala_2.12/sbt_1.0/0.5.1/srcs/sbt-bintray-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.jetbrains/sbt-idea-shell/scala_2.12/sbt_1.0/2017.2/srcs/sbt-idea-shell-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/org.jetbrains/sbt-structure-extractor/scala_2.12/sbt_1.0/2017.2/srcs/sbt-structure-extractor-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/eed3si9n/gigahorse-core_2.12/0.3.0/gigahorse-core_2.12-0.3.0-sources.jar!/" />
@@ -125,9 +139,11 @@
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.12/0.4.2/fastparse_2.12-0.4.2-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.1.3/sourcecode_2.12-0.1.3-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lmax/disruptor/3.3.6/disruptor-3.3.6-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/ning/async-http-client/1.9.11/async-http-client-1.9.11-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/squareup/okhttp3/okhttp-urlconnection/3.7.0/okhttp-urlconnection-3.7.0-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/3.7.0/okhttp-3.7.0-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/squareup/okio/okio/1.12.0/okio-1.12.0-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/thoughtworks/paranamer/paranamer/2.8/paranamer-2.8-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/trueaccord/lenses/lenses_2.12/0.4.12/lenses_2.12-0.4.12-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/trueaccord/scalapb/compilerplugin_2.12/0.6.6/compilerplugin_2.12-0.6.6-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/com/trueaccord/scalapb/protoc-bridge_2.12/0.3.0-M1/protoc-bridge_2.12-0.3.0-M1-sources.jar!/" />
@@ -138,10 +154,18 @@
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier-extra_2.12/1.0.0-RC13/coursier-extra_2.12-1.0.0-RC13-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier_2.12/1.0.0-RC13/coursier_2.12-1.0.0-RC13-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/io/get-coursier/sbt-coursier_2.12_1.0/1.0.0-RC13/sbt-coursier-1.0.0-RC13-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/io/netty/netty/3.10.0.Final/netty-3.10.0.Final-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/jline/jline/2.14.4/jline-2.14.4-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/net/databinder/dispatch/dispatch-core_2.12/0.12.0/dispatch-core_2.12-0.12.0-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/net/databinder/dispatch/dispatch-json4s-native_2.12/0.12.0/dispatch-json4s-native_2.12-0.12.0-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.8.1/log4j-api-2.8.1-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.8.1/log4j-core-2.8.1-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.8.1/log4j-slf4j-impl-2.8.1-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/foundweekends/bintry_2.12/0.5.1/bintry_2.12-0.5.1-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/json4s/json4s-ast_2.12/3.4.2/json4s-ast_2.12-3.4.2-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/json4s/json4s-core_2.12/3.4.2/json4s-core_2.12-3.4.2-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/json4s/json4s-native_2.12/3.4.2/json4s-native_2.12-3.4.2-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/json4s/json4s-scalap_2.12/3.4.2/json4s-scalap_2.12-3.4.2-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/reactivestreams/reactive-streams/1.0.0/reactive-streams-1.0.0-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.12/1.0.5/scala-parser-combinators_2.12-1.0.5-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6-sources.jar!/" />
@@ -192,6 +216,7 @@
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-core_2.12/7.2.16/scalaz-core_2.12-7.2.16-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-effect_2.12/7.2.16/scalaz-effect_2.12-7.2.16-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-nop/1.7.7/slf4j-nop-1.7.7-sources.jar!/" />
           <root url="jar://$USER_HOME$/.coursier/cache/v1/https/repo1.maven.org/maven2/org/spire-math/jawn-parser_2.12/0.10.4/jawn-parser_2.12-0.10.4-sources.jar!/" />
         </SOURCES>
       </library>

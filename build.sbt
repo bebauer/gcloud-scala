@@ -3,6 +3,10 @@ lazy val `gcloud-scala` = (project in file("."))
     inThisBuild(commonSettings)
   )
   .aggregate(`gcloud-scala-proto`, `gcloud-scala-pubsub`, `gcloud-scala-pubsub-testkit`)
+  .settings(
+    publish := {},
+    publishLocal := {}
+  )
 
 lazy val `gcloud-scala-pubsub` =
   (project in file("pubsub"))
@@ -56,5 +60,6 @@ lazy val commonSettings = Seq(
     "-target",
     "1.8"
   ),
-  fork in Test := true
+  fork in Test := true,
+  licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
 )
