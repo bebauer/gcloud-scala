@@ -43,7 +43,7 @@ lazy val `gcloud-scala-proto` = (project in file("proto")).settings(
 lazy val fetchProtos = taskKey[Unit]("Download Google protos and extract to target.")
 
 lazy val commonSettings = Seq(
-  organization := "de.codecentric",
+  organization := "gcloud-scala",
   scalaVersion := "2.12.4",
   crossScalaVersions := Seq("2.11.11", "2.12.4"),
   scalacOptions ++= Seq(
