@@ -69,9 +69,6 @@ trait PubSubTestKit extends LocalPubSub {
       results
   }
 
-  implicit val pubSubMessageConverter: PubsubMessage => PubsubMessage = (message: PubsubMessage) =>
-    message
-
   implicit val stringToPubSubMessageConverter: String => PubsubMessage = (value: String) =>
     PubsubMessage(ByteString.copyFromUtf8(value))
 }

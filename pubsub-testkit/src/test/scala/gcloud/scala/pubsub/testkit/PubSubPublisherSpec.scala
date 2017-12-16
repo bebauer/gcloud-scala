@@ -1,5 +1,7 @@
 package gcloud.scala.pubsub.testkit
 
+import com.google.protobuf.ByteString
+import com.google.pubsub.v1.PubsubMessage
 import gcloud.scala.pubsub.TopicName
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -25,12 +27,22 @@ class PubSubPublisherSpec extends AsyncWordSpec with Matchers with ScalaFutures 
       }
     }
 
-    "publish messages" in {
+    "publish string messages" in {
       val (_, topic, _) = newTestSetup()
 
       client.publish(topic, collection.immutable.Seq("XXX", "AAA")).map { ids =>
         ids should have size 2
       }
+    }
+
+    "publish pubsub messages" in {
+      val (_, topic, _) = newTestSetup()
+
+      client
+        .publish(topic, collection.immutable.Seq(PubsubMessage(ByteString.copyFromUtf8("XXX"))))
+        .map { ids =>
+          ids should have size 1
+        }
     }
 
     "get existing topic" in {

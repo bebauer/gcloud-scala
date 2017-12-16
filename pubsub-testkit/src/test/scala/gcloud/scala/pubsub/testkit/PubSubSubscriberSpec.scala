@@ -1,7 +1,8 @@
 package gcloud.scala.pubsub.testkit
 
+import com.google.protobuf.ByteString
 import com.google.protobuf.field_mask.FieldMask
-import com.google.pubsub.v1.{PushConfig, Subscription}
+import com.google.pubsub.v1.{PubsubMessage, PushConfig, Subscription}
 import gcloud.scala.pubsub.SubscriptionName
 import io.grpc.StatusRuntimeException
 import org.scalatest.concurrent.ScalaFutures
@@ -90,7 +91,8 @@ class PubSubSubscriberSpec
       val settings             = newTestSetup()
       val (_, _, subscription) = settings
 
-      publishMessages(settings, "A", "B", "C")
+      publishMessages(settings, "A", "B")
+      publishMessages(settings, PubsubMessage(ByteString.copyFromUtf8("C")))
 
       whenReady(
         client.pull(subscription, returnImmediately = true, maxMessages = Some(10))
