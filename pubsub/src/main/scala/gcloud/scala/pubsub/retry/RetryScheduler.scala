@@ -16,7 +16,9 @@ object RetryScheduler {
     override def schedule[T](after: Duration)(task: => Future[T]): Future[T] = {
       val promise = Promise[T]()
 
-      scheduler.schedule(() => promise.completeWith(task), after.length, after.unit)
+      scheduler.schedule(new Runnable {
+        override def run(): Unit = promise.completeWith(task)
+      }, after.length, after.unit)
 
       promise.future
     }
