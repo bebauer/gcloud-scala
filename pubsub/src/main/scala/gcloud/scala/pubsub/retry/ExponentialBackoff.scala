@@ -1,19 +1,25 @@
 package gcloud.scala.pubsub.retry
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, FiniteDuration}
 
 object ExponentialBackoff {
   implicit class ExponentialBackoffAttempt(attempt: RetryAttempt) {
     def next: RetryAttempt = {
       val settings = attempt.settings
 
-      var newRetryDelay: Duration = settings.initialRetryDelay
-      var newRpcTimeout: Duration = settings.initialRpcTimeout
+      var newRetryDelay: FiniteDuration = settings.initialRetryDelay
+      var newRpcTimeout: FiniteDuration = settings.initialRpcTimeout
 
       if (attempt.attempts > 0) {
-        newRetryDelay = attempt.retryDelay * settings.retryDelayMultiplier
+        newRetryDelay = attempt.retryDelay * settings.retryDelayMultiplier match {
+          case f: FiniteDuration => f
+          case _                 => settings.maxRetryDelay
+        }
         newRetryDelay = newRetryDelay.min(settings.maxRetryDelay)
-        newRpcTimeout = attempt.rpcTimeout * settings.rpcTimeoutMultiplier
+        newRpcTimeout = attempt.rpcTimeout * settings.rpcTimeoutMultiplier match {
+          case f: FiniteDuration => f
+          case _                 => settings.maxRpcTimeout
+        }
         newRpcTimeout = newRpcTimeout.min(settings.maxRpcTimeout)
       }
 

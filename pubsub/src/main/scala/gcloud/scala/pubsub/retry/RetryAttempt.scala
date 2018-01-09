@@ -1,6 +1,6 @@
 package gcloud.scala.pubsub.retry
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, FiniteDuration}
 
 object RetryAttempt {
   def first(settings: RetrySettings) =
@@ -15,8 +15,8 @@ object RetryAttempt {
 }
 
 case class RetryAttempt(settings: RetrySettings,
-                        retryDelay: Duration,
-                        rpcTimeout: Duration,
-                        randomizedDelay: Duration,
+                        retryDelay: FiniteDuration,
+                        rpcTimeout: FiniteDuration,
+                        randomizedDelay: FiniteDuration,
                         attempts: Int,
                         firstAttemptStartTimeNanos: Long) {}

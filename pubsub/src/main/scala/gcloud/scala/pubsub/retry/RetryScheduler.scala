@@ -2,7 +2,7 @@ package gcloud.scala.pubsub.retry
 
 import java.util.concurrent.Executors
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Future, Promise}
 
 object RetryScheduler {
@@ -13,7 +13,7 @@ object RetryScheduler {
 
     private val scheduler = Executors.newScheduledThreadPool(poolSize)
 
-    override def schedule[T](after: Duration)(task: => Future[T]): Future[T] = {
+    override def schedule[T](after: FiniteDuration)(task: => Future[T]): Future[T] = {
       val promise = Promise[T]()
 
       scheduler.schedule(new Runnable {
@@ -26,5 +26,5 @@ object RetryScheduler {
 }
 
 trait RetryScheduler {
-  def schedule[T](after: Duration)(task: => Future[T]): Future[T]
+  def schedule[T](after: FiniteDuration)(task: => Future[T]): Future[T]
 }

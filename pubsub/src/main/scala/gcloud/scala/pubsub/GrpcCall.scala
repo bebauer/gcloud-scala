@@ -7,12 +7,12 @@ import gcloud.scala.pubsub.retry.ExponentialBackoff._
 import gcloud.scala.pubsub.retry.{RetryAttempt, RetryScheduler}
 import io.grpc.StatusRuntimeException
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
 object GrpcCall {
   implicit class FutureExtensions[T](future: Future[T]) {
-    def withTimeout(duration: Duration,
+    def withTimeout(duration: FiniteDuration,
                     exception: Exception = new TimeoutException("Future timed out!"))(
         implicit executionContext: ExecutionContext,
         scheduler: RetryScheduler
@@ -29,7 +29,9 @@ object GrpcCall {
     callWithRetry(callSettings, attempt, call)
   }
 
-  private def callWithRetry[T](callSettings: CallSettings, attempt: RetryAttempt, call: => Future[T])(
+  private def callWithRetry[T](callSettings: CallSettings,
+                               attempt: RetryAttempt,
+                               call: => Future[T])(
       implicit executionContext: ExecutionContext,
       scheduler: RetryScheduler
   ): Future[T] =
@@ -39,7 +41,9 @@ object GrpcCall {
         val nextAttempt = attempt.next
 
         if (nextAttempt.shouldRetry) {
-          scheduler.schedule(nextAttempt.randomizedDelay)(callWithRetry(callSettings, nextAttempt, call))
+          scheduler.schedule(nextAttempt.randomizedDelay)(
+            callWithRetry(callSettings, nextAttempt, call)
+          )
         } else {
           throw sre
         }
