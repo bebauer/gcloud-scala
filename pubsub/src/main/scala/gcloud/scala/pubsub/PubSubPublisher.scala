@@ -53,8 +53,8 @@ trait PubSubPublisher extends AutoCloseable {
 
   def publish(topicName: TopicName, messages: Seq[PubsubMessage]): Future[Seq[String]] =
     GrpcCall(publishSettings) {
-      publisherStub.publish(PublishRequest(topicName.fullName, messages)).map(_.messageIds.to[Seq])
-    }
+      publisherStub.publish(PublishRequest(topicName.fullName, messages))
+    }.map(_.messageIds.to[Seq])
 
   def updateTopic(topic: Topic, updateMask: Option[FieldMask] = None): Future[Topic] =
     GrpcCall(updateTopicSettings) {
