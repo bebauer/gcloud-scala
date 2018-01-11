@@ -64,7 +64,7 @@ trait LocalPubSub extends BeforeAndAfterAll with Eventually with Matchers {
     super.beforeAll()
   }
 
-  override def afterAll() {
+  override protected def afterAll() {
     try super.afterAll()
     finally {
       val maybePid = Try(
