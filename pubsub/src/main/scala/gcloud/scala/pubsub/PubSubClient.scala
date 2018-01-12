@@ -6,13 +6,37 @@ import io.grpc.Channel
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
+/**
+  * [[PubSubClient]] companion object. Use the [[PubSubClient.apply]] methods to create instances of the default client.
+  */
 object PubSubClient {
+
+  /**
+    * Creates the client with default settings.
+    *
+    * @param executor the [[ExecutionContextExecutor]] on which the client operations are performed
+    * @return the PubSubClient
+    */
   def apply()(implicit executor: ExecutionContextExecutor): PubSubClient =
     apply(PubSubUrl.DefaultPubSubUrl)
 
+  /**
+    * Create the client with the specified URL.
+    *
+    * @param pubSubUrl the Pub/Sub URL
+    * @param executor the [[ExecutionContextExecutor]] on which the client operations are performed
+    * @return the PubSubClient
+    */
   def apply(pubSubUrl: PubSubUrl)(implicit executor: ExecutionContextExecutor): PubSubClient =
     apply(PubSubClientConfig(pubSubUrl))
 
+  /**
+    * Create the client with the specified config.
+    *
+    * @param config the Pub/Sub client config
+    * @param executor the [[ExecutionContextExecutor]] on which the client operations are performed
+    * @return the PubSubClient
+    */
   def apply(config: PubSubClientConfig)(implicit executor: ExecutionContextExecutor): PubSubClient =
     new DefaultClient(config, Some(executor))
 
@@ -37,4 +61,7 @@ object PubSubClient {
   }
 }
 
+/**
+  * The trait for a Pub/Sub client. For getting a default implementation see the [[PubSubClient]] companion object.
+  */
 trait PubSubClient extends PubSubPublisher with PubSubSubscriber

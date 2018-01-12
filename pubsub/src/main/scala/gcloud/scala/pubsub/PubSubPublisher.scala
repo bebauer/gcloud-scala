@@ -10,6 +10,9 @@ import io.grpc.auth.MoreCallCredentials
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+  * Trait providing publishing related client operations.
+  */
 trait PubSubPublisher extends AutoCloseable {
 
   implicit val executionContext: ExecutionContext
@@ -22,6 +25,15 @@ trait PubSubPublisher extends AutoCloseable {
     .stub(getChannel)
     .withCallCredentials(MoreCallCredentials.from(getCredentials))
 
+  /**
+    * List all topics for a project.
+    *
+    * @param projectName the project
+    * @param pageSize maximum number of topics to return for a page
+    * @param pageToken the token for the page (provided by [[ListTopicsResponse]])
+    * @param callSettings call settings for this operation
+    * @return the response
+    */
   def listTopics(
       projectName: ProjectName,
       pageSize: Option[Int] = None,
