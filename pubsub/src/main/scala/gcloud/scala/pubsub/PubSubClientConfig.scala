@@ -5,7 +5,6 @@ import com.google.auth.oauth2.GoogleCredentials
 import gcloud.scala.pubsub.PubSubClientConfig.CallSettings
 import gcloud.scala.pubsub.retry.RetrySettings.ComplexRetry
 import gcloud.scala.pubsub.retry.{RetryScheduler, RetrySettings}
-import io.grpc.netty.{NegotiationType, NettyChannelBuilder}
 import io.grpc.{ManagedChannel, Status}
 
 import scala.concurrent.ExecutionContextExecutor
@@ -18,35 +17,11 @@ object PubSubClientConfig {
 
   trait ChannelProvider {
     def channel(maybeExecutor: Option[ExecutionContextExecutor] = None): ClientChannel
+
+    def closeChannel(channel: ClientChannel)
   }
 
   case class ClientChannel(channel: ManagedChannel, executor: ExecutionContextExecutor)
-
-  case class DefaultChannelProvider(url: PubSubUrl = PubSubUrl.DefaultPubSubUrl,
-                                    maxInboundMessageSize: Int = DefaultMaxInboundMessageSize)
-      extends ChannelProvider {
-    override def channel(maybeExecutor: Option[ExecutionContextExecutor]): ClientChannel =
-      maybeExecutor match {
-        case Some(executor) =>
-          ClientChannel(
-            channel = NettyChannelBuilder
-              .forAddress(url.host, url.port)
-              .maxInboundMessageSize(maxInboundMessageSize)
-              .flowControlWindow(5000000)
-              .negotiationType(
-                if (url.tlsEnabled) NegotiationType.TLS
-                else NegotiationType.PLAINTEXT
-              )
-              .executor(executor)
-              .build(),
-            executor = executor
-          )
-        case None =>
-          throw new IllegalArgumentException(
-            "An executor has to be defined for the default channel provider."
-          )
-      }
-  }
 
   case class CallSettings(retryStatusCodes: Set[Status], retrySettings: RetrySettings)
 
@@ -110,8 +85,7 @@ object PubSubClientConfig {
 }
 
 case class PubSubClientConfig(
-    channelProvider: PubSubClientConfig.ChannelProvider =
-      PubSubClientConfig.DefaultChannelProvider(),
+    channelProvider: PubSubClientConfig.ChannelProvider = DefaultChannelProvider(),
     credentialsProvider: PubSubClientConfig.CredentialsProvider =
       PubSubClientConfig.DefaultCredentialsProvider,
     retryScheduler: RetryScheduler = RetryScheduler(),

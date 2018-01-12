@@ -33,7 +33,7 @@ object PubSubClient {
     override implicit val retryScheduler: RetryScheduler = config.retryScheduler
 
     override def close(): Unit =
-      clientChannel.channel.shutdown()
+      config.channelProvider.closeChannel(clientChannel)
 
     override val createSubscriptionSettings: PubSubClientConfig.CallSettings =
       config.createSubscriptionSettings
