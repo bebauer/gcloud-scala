@@ -2,7 +2,6 @@ package gcloud.scala.pubsub
 
 import java.util.concurrent.TimeoutException
 
-import gcloud.scala.pubsub.PubSubClientConfig.CallSettings
 import gcloud.scala.pubsub.retry.ExponentialBackoff._
 import gcloud.scala.pubsub.retry.{RetryAttempt, RetryScheduler}
 import io.grpc.StatusRuntimeException
@@ -10,7 +9,7 @@ import io.grpc.StatusRuntimeException
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
-object GrpcCall {
+private[pubsub] object GrpcCall {
   implicit class FutureExtensions[T](future: Future[T]) {
     def withTimeout(duration: FiniteDuration,
                     exception: Exception = new TimeoutException("Future timed out!"))(
@@ -20,21 +19,21 @@ object GrpcCall {
       Future.firstCompletedOf(Seq(future, scheduler.schedule(duration)(Future.failed(exception))))
   }
 
-  def apply[T](callSettings: CallSettings)(call: => Future[T])(
+  def apply[Request, Response](method: => Future[Response], callSettings: CallSettings[Request])(
       implicit executionContext: ExecutionContext,
       scheduler: RetryScheduler
-  ): Future[T] = {
+  ): Future[Response] = {
     val attempt = RetryAttempt.first(callSettings.retrySettings)
 
-    callWithRetry(callSettings, attempt, call)
+    callWithRetry(attempt, method, callSettings)
   }
 
-  private def callWithRetry[T](callSettings: CallSettings,
-                               attempt: RetryAttempt,
-                               call: => Future[T])(
+  private def callWithRetry[Request, Response](attempt: RetryAttempt,
+                                               call: => Future[Response],
+                                               callSettings: CallSettings[Request])(
       implicit executionContext: ExecutionContext,
       scheduler: RetryScheduler
-  ): Future[T] =
+  ): Future[Response] =
     call withTimeout attempt.rpcTimeout recoverWith {
       case sre: StatusRuntimeException
           if callSettings.retryStatusCodes.exists(_.getCode == sre.getStatus.getCode) =>
@@ -42,7 +41,7 @@ object GrpcCall {
 
         if (nextAttempt.shouldRetry) {
           scheduler.schedule(nextAttempt.randomizedDelay)(
-            callWithRetry(callSettings, nextAttempt, call)
+            callWithRetry(nextAttempt, call, callSettings)
           )
         } else {
           throw sre

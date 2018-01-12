@@ -34,28 +34,6 @@ object PubSubClient {
 
     override def close(): Unit =
       config.channelProvider.closeChannel(clientChannel)
-
-    override val createSubscriptionSettings: PubSubClientConfig.CallSettings =
-      config.createSubscriptionSettings
-    override val updateSubscriptionSettings: PubSubClientConfig.CallSettings =
-      config.updateSubscriptionSettings
-    override val listSubscriptionSettings: PubSubClientConfig.CallSettings =
-      config.listSubscriptionSettings
-    override val deleteSubscriptionSettings: PubSubClientConfig.CallSettings =
-      config.deleteSubscriptionSettings
-    override val pullSettings: PubSubClientConfig.CallSettings        = config.pullSettings
-    override val acknowledgeSettings: PubSubClientConfig.CallSettings = config.acknowledgeSettings
-    override val modifyAckDeadlineSettings: PubSubClientConfig.CallSettings =
-      config.modifyAckDeadlineSettings
-    override val modifyPushConfigSettings: PubSubClientConfig.CallSettings =
-      config.modifyPushConfigSettings
-    override val listTopicsSettings: PubSubClientConfig.CallSettings  = config.listTopicsSettings
-    override val createTopicSettings: PubSubClientConfig.CallSettings = config.createTopicSettings
-    override val updateTopicSettings: PubSubClientConfig.CallSettings = config.updateTopicSettings
-    override val deleteTopicSettings: PubSubClientConfig.CallSettings = config.deleteTopicSettings
-    override val listTopicSubscriptionsSettings: PubSubClientConfig.CallSettings =
-      config.listTopicSubscriptionsSettings
-    override val publishSettings: PubSubClientConfig.CallSettings = config.publishSettings
   }
 }
 

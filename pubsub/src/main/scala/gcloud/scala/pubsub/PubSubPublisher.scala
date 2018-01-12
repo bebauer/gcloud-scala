@@ -4,7 +4,6 @@ import com.google.auth.Credentials
 import com.google.protobuf.empty.Empty
 import com.google.protobuf.field_mask.FieldMask
 import com.google.pubsub.v1._
-import gcloud.scala.pubsub.PubSubClientConfig.CallSettings
 import gcloud.scala.pubsub.retry.RetryScheduler
 import io.grpc.Channel
 import io.grpc.auth.MoreCallCredentials
@@ -16,13 +15,6 @@ trait PubSubPublisher extends AutoCloseable {
   implicit val executionContext: ExecutionContext
   implicit val retryScheduler: RetryScheduler
 
-  val listTopicsSettings: CallSettings
-  val createTopicSettings: CallSettings
-  val updateTopicSettings: CallSettings
-  val deleteTopicSettings: CallSettings
-  val listTopicSubscriptionsSettings: CallSettings
-  val publishSettings: CallSettings
-
   def getChannel: Channel
   def getCredentials: Credentials
 
@@ -30,52 +22,57 @@ trait PubSubPublisher extends AutoCloseable {
     .stub(getChannel)
     .withCallCredentials(MoreCallCredentials.from(getCredentials))
 
-  def listTopics(projectName: ProjectName,
-                 pageSize: Option[Int] = None,
-                 pageToken: Option[String] = None): Future[ListTopicsResponse] =
-    GrpcCall(listTopicsSettings) {
-      publisherStub
-        .listTopics(
-          ListTopicsRequest(projectName.fullName, pageSize.getOrElse(0), pageToken.getOrElse(""))
-        )
-    }
+  def listTopics(
+      projectName: ProjectName,
+      pageSize: Option[Int] = None,
+      pageToken: Option[String] = None
+  )(implicit callSettings: CallSettings[ListTopicsRequest]): Future[ListTopicsResponse] =
+    GrpcCall(
+      publisherStub.listTopics(
+        ListTopicsRequest(projectName.fullName, pageSize.getOrElse(0), pageToken.getOrElse(""))
+      ),
+      callSettings
+    )
 
-  def createTopic(topic: Topic): Future[Topic] =
-    GrpcCall(createTopicSettings) {
-      publisherStub
-        .createTopic(topic)
-    }
+  def createTopic(topic: Topic)(implicit callSettings: CallSettings[Topic]): Future[Topic] =
+    GrpcCall(publisherStub.createTopic(topic), callSettings)
 
-  def getTopic(topicName: TopicName): Future[Option[Topic]] =
-    listTopics(topicName.projectName)
+  def getTopic(
+      topicName: TopicName
+  )(implicit callSettings: CallSettings[ListTopicsRequest]): Future[Option[Topic]] =
+    listTopics(topicName.projectName)(callSettings)
       .map(_.topics)
       .map(topics => topics.find(_.name == topicName.fullName))
 
-  def publish(topicName: TopicName, messages: Seq[PubsubMessage]): Future[Seq[String]] =
-    GrpcCall(publishSettings) {
-      publisherStub.publish(PublishRequest(topicName.fullName, messages))
-    }.map(_.messageIds.to[Seq])
+  def publish(topicName: TopicName, messages: Seq[PubsubMessage])(
+      implicit callSettings: CallSettings[PublishRequest]
+  ): Future[Seq[String]] =
+    GrpcCall(publisherStub.publish(PublishRequest(topicName.fullName, messages)), callSettings)
+      .map(_.messageIds.to[Seq])
 
-  def updateTopic(topic: Topic, updateMask: Option[FieldMask] = None): Future[Topic] =
-    GrpcCall(updateTopicSettings) {
-      publisherStub.updateTopic(UpdateTopicRequest(Some(topic), updateMask))
-    }
+  def updateTopic(topic: Topic, updateMask: Option[FieldMask] = None)(
+      implicit callSettings: CallSettings[UpdateTopicRequest]
+  ): Future[Topic] =
+    GrpcCall(publisherStub.updateTopic(UpdateTopicRequest(Some(topic), updateMask)), callSettings)
 
-  def deleteTopic(topicName: TopicName): Future[Empty] =
-    GrpcCall(deleteTopicSettings) {
-      publisherStub.deleteTopic(DeleteTopicRequest(topicName.fullName))
-    }
+  def deleteTopic(
+      topicName: TopicName
+  )(implicit callSettings: CallSettings[DeleteTopicRequest]): Future[Empty] =
+    GrpcCall(publisherStub.deleteTopic(DeleteTopicRequest(topicName.fullName)), callSettings)
 
   def listTopicSubscriptions(
       topicName: TopicName,
       pageSize: Option[Int] = None,
       pageToken: Option[String] = None
+  )(
+      implicit callSettings: CallSettings[ListTopicSubscriptionsRequest]
   ): Future[ListTopicSubscriptionsResponse] =
-    GrpcCall(listTopicSubscriptionsSettings) {
+    GrpcCall(
       publisherStub.listTopicSubscriptions(
         ListTopicSubscriptionsRequest(topicName.fullName,
                                       pageSize.getOrElse(0),
                                       pageToken.getOrElse(""))
-      )
-    }
+      ),
+      callSettings
+    )
 }
