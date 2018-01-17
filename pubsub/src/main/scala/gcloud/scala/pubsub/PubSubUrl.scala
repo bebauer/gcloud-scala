@@ -19,4 +19,6 @@ object PubSubUrl {
   }
 }
 
-case class PubSubUrl(host: String, port: Int, tlsEnabled: Boolean)
+case class PubSubUrl(host: String, port: Int, tlsEnabled: Boolean) {
+  val url = s"$host:$port"
+}

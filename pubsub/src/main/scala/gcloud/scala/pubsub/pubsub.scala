@@ -1,24 +1,29 @@
 package gcloud.scala
 
+import com.google.cloud
+import com.google.cloud.pubsub.v1._
+import com.google.protobuf.{Empty, FieldMask}
+import com.google.pubsub.v1
+import com.google.pubsub.v1.{ProjectName, _}
+import org.threeten.bp.Duration
+
+import scala.collection.JavaConverters._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 
 package object pubsub {
+  import gcloud.scala.pubsub.FutureConversions.Implicits._
 
-  type Seq[+A] = scala.collection.immutable.Seq[A]
-
-  //noinspection TypeAnnotation
-  val Seq = scala.collection.immutable.Seq
+  /**
+    * Implicitly converts a string to a [[ProjectName]] by calling [[ProjectName.apply()]].
+    *
+    * @param name the name
+    * @return the [[ProjectName]]
+    */
+  implicit def projectFromString(name: String): ProjectName = ProjectName(name)
 
   object ProjectName {
     private val ProjectNamePattern = "(projects/)?(.+)".r
-
-    /**
-      * Implicitly converts a string to a [[ProjectName]] by calling [[ProjectName.apply()]].
-      *
-      * @param name the name
-      * @return the [[ProjectName]]
-      */
-    implicit def fromString(name: String): ProjectName = ProjectName(name)
 
     /**
       * Creates a [[ProjectName]] by parsing a name string.
@@ -29,35 +34,29 @@ package object pubsub {
       * @throws IllegalArgumentException if the name cannot be parsed
       */
     def apply(name: String): ProjectName =
-      new ProjectName(name match {
-        case ProjectNamePattern(n)    => n
-        case ProjectNamePattern(_, n) => n
-        case _ =>
-          throw new IllegalArgumentException(
-            s"Project name '$name' does not match pattern '$ProjectNamePattern'."
-          )
-      })
+      v1.ProjectName
+        .newBuilder()
+        .setProject(name match {
+          case ProjectNamePattern(n)    => n
+          case ProjectNamePattern(_, n) => n
+          case _ =>
+            throw new IllegalArgumentException(
+              s"Project name '$name' does not match pattern '$ProjectNamePattern'."
+            )
+        })
+        .build()
   }
 
   /**
-    * Class for a Google Cloud project name.
+    * Implicitly converts a string to a [[TopicName]] by calling [[TopicName.apply()]].
     *
-    * @param name the name of the project
+    * @param fullName the full name
+    * @return the [[TopicName]]
     */
-  class ProjectName(val name: String) {
-    val fullName: String = s"projects/$name"
-  }
+  implicit def topicFromString(fullName: String): TopicName = TopicName(fullName)
 
   object TopicName {
     private val TopicNamePattern = "projects/(.+)/topics/(.+)".r
-
-    /**
-      * Implicitly converts a string to a [[TopicName]] by calling [[TopicName.apply()]].
-      *
-      * @param fullName the full name
-      * @return the [[TopicName]]
-      */
-    implicit def fromString(fullName: String): TopicName = TopicName(fullName)
 
     /**
       * Creates a [[TopicName]] by parsing the full name (projects/{project}/topics/{topic}) string.
@@ -81,29 +80,25 @@ package object pubsub {
       * @param name the topic name
       * @return the [[TopicName]]
       */
-    def apply(projectName: ProjectName, name: String): TopicName = new TopicName(projectName, name)
+    def apply(projectName: ProjectName, name: String): TopicName =
+      v1.TopicName.newBuilder().setProject(projectName.getProject).setTopic(name).build()
+  }
+
+  implicit class TopicNameExtensions(val topicName: TopicName) extends AnyVal {
+    def fullName: String = topicName.toString
   }
 
   /**
-    * Class for a Google Cloud Pub/Sub topic name.
+    * Implicitly converts a string to a [[SubscriptionName]] by calling [[SubscriptionName.apply()]].
     *
-    * @param projectName the name of the project
-    * @param name the name of the topic
+    * @param fullName the full name
+    * @return the [[SubscriptionName]]
     */
-  class TopicName(val projectName: ProjectName, val name: String) {
-    val fullName: String = s"${projectName.fullName}/topics/$name"
-  }
+  implicit def subscriptionFromString(fullName: String): SubscriptionName =
+    SubscriptionName(fullName)
 
   object SubscriptionName {
     private val SubscriptionNamePattern = "projects/(.+)/subscriptions/(.+)".r
-
-    /**
-      * Implicitly converts a string to a [[SubscriptionName]] by calling [[SubscriptionName.apply()]].
-      *
-      * @param fullName the full name
-      * @return the [[SubscriptionName]]
-      */
-    implicit def fromString(fullName: String): SubscriptionName = SubscriptionName(fullName)
 
     /**
       * Creates a [[SubscriptionName]] by parsing the full name
@@ -130,16 +125,224 @@ package object pubsub {
       * @return the [[SubscriptionName]]
       */
     def apply(projectName: ProjectName, name: String): SubscriptionName =
-      new SubscriptionName(projectName, name)
+      v1.SubscriptionName
+        .newBuilder()
+        .setProject(projectName.getProject)
+        .setSubscription(name)
+        .build()
   }
 
-  /**
-    * Class for a Google Cloud Pub/Sub subscription name.
-    *
-    * @param projectName the name of the project
-    * @param name the name of the subscription
-    */
-  class SubscriptionName(val projectName: ProjectName, val name: String) {
-    val fullName: String = s"${projectName.fullName}/subscriptions/$name"
+  object Topic {
+    def apply(topicName: TopicName): Topic =
+      v1.Topic.newBuilder().setNameWithTopicName(topicName).build()
+  }
+
+  object Subscription {
+    def apply(subscriptionName: SubscriptionName, topicName: TopicName): Subscription =
+      v1.Subscription
+        .newBuilder()
+        .setTopic(topicName.fullName)
+        .setNameWithSubscriptionName(subscriptionName)
+        .build()
+  }
+
+  object TopicAdminClient {
+    def apply(pubSubUrl: PubSubUrl): TopicAdminClient =
+      cloud.pubsub.v1.TopicAdminClient
+        .create(TopicAdminSettings.newBuilder().setEndpoint(pubSubUrl.url).build())
+
+    def apply(pubSubUrl: PubSubUrl, maxInboundMessageSize: Int): TopicAdminClient =
+      cloud.pubsub.v1.TopicAdminClient
+        .create(
+          TopicAdminSettings
+            .newBuilder()
+            .setTransportChannelProvider(
+              TopicAdminSettings
+                .defaultGrpcTransportProviderBuilder()
+                .setEndpoint(pubSubUrl.url)
+                .setMaxInboundMessageSize(maxInboundMessageSize)
+                .build()
+            )
+            .build()
+        )
+
+    def apply(): TopicAdminClient = cloud.pubsub.v1.TopicAdminClient.create()
+  }
+
+  object SubscriptionAdminClient {
+    def apply(pubSubUrl: PubSubUrl): SubscriptionAdminClient =
+      cloud.pubsub.v1.SubscriptionAdminClient
+        .create(SubscriptionAdminSettings.newBuilder().setEndpoint(pubSubUrl.url).build())
+
+    def apply(pubSubUrl: PubSubUrl, maxInboundMessageSize: Int): SubscriptionAdminClient =
+      cloud.pubsub.v1.SubscriptionAdminClient
+        .create(
+          SubscriptionAdminSettings
+            .newBuilder()
+            .setTransportChannelProvider(
+              SubscriptionAdminSettings
+                .defaultGrpcTransportProviderBuilder()
+                .setEndpoint(pubSubUrl.url)
+                .setMaxInboundMessageSize(maxInboundMessageSize)
+                .build()
+            )
+            .build()
+        )
+
+    def apply(): TopicAdminClient = cloud.pubsub.v1.TopicAdminClient.create()
+  }
+
+  object Subscriber {
+    private final val MaxInboundMessageSize = 20 * 1024 * 1024 // 20MB API maximum message size.
+
+    def apply(subscriptionName: SubscriptionName,
+              messageReceiver: MessageReceiver,
+              pubSubUrl: PubSubUrl = PubSubUrl.DefaultPubSubUrl,
+              maxInboundMessageSize: Int = MaxInboundMessageSize): Subscriber =
+      cloud.pubsub.v1.Subscriber
+        .newBuilder(subscriptionName, messageReceiver)
+        .setChannelProvider(
+          SubscriptionAdminSettings.defaultGrpcTransportProviderBuilder
+            .setEndpoint(pubSubUrl.url)
+            .setMaxInboundMessageSize(maxInboundMessageSize)
+            .setKeepAliveTime(Duration.ofMinutes(5))
+            .build()
+        )
+        .build()
+  }
+
+  implicit class SubscriptionNameExtensions(val subscriptionName: SubscriptionName) extends AnyVal {
+    def fullName: String = subscriptionName.toString
+  }
+
+  implicit class SubscriptionAdminClientValueClass(val client: SubscriptionAdminClient)
+      extends AnyVal {
+    def getSubscriptionAsync(subscriptionName: SubscriptionName): Future[Option[Subscription]] = {
+      implicit val ec =
+        ExecutionContext.fromExecutor(client.getSettings.getExecutorProvider.getExecutor)
+
+      listSubscriptionsAsync(subscriptionName.getProject)
+        .map(response => response.getSubscriptionsList.asScala)
+        .map(_.find(_.getName == subscriptionName.fullName))
+    }
+
+    def createSubscriptionAsync(subscription: Subscription): Future[Subscription] =
+      client.createSubscriptionCallable().futureCall(subscription)
+
+    def updateSubscriptionAsync(subscription: Subscription,
+                                updateMask: Option[FieldMask] = None): Future[Subscription] = {
+      val requestBuilder = UpdateSubscriptionRequest
+        .newBuilder()
+        .setSubscription(subscription)
+
+      updateMask.foreach(requestBuilder.setUpdateMask)
+
+      client
+        .updateSubscriptionCallable()
+        .futureCall(
+          requestBuilder.build()
+        )
+    }
+
+    def deleteSubscriptionAsync(subscriptionName: SubscriptionName): Future[Empty] =
+      client
+        .deleteSubscriptionCallable()
+        .futureCall(
+          DeleteSubscriptionRequest
+            .newBuilder()
+            .setSubscriptionWithSubscriptionName(subscriptionName)
+            .build()
+        )
+
+    def listSubscriptionsAsync(
+        projectName: ProjectName,
+        pageSize: Option[Int] = None,
+        pageToken: Option[String] = None
+    ): Future[ListSubscriptionsResponse] =
+      client
+        .listSubscriptionsCallable()
+        .futureCall(
+          ListSubscriptionsRequest
+            .newBuilder()
+            .setProjectWithProjectName(projectName)
+            .setPageSize(pageSize.getOrElse(0))
+            .setPageToken(pageToken.getOrElse(""))
+            .build()
+        )
+
+    def modifyPushConfigAsync(subscriptionName: SubscriptionName,
+                              pushConfig: PushConfig): Future[Empty] =
+      client
+        .modifyPushConfigCallable()
+        .futureCall(ModifyPushConfigRequest.newBuilder().setPushConfig(pushConfig).build())
+  }
+
+  implicit class TopicAdminClientValueClass(val client: TopicAdminClient) extends AnyVal {
+    def listTopicsAsync(
+        projectName: ProjectName,
+        pageSize: Option[Int] = None,
+        pageToken: Option[String] = None
+    ): Future[ListTopicsResponse] =
+      client
+        .listTopicsCallable()
+        .futureCall(
+          ListTopicsRequest
+            .newBuilder()
+            .setProjectWithProjectName(projectName)
+            .setPageSize(pageSize.getOrElse(0))
+            .setPageToken(pageToken.getOrElse(""))
+            .build()
+        )
+
+    def createTopicAsync(topic: Topic): Future[Topic] =
+      client.createTopicCallable().futureCall(topic)
+
+    def getTopicAsync(topicName: TopicName): Future[Option[Topic]] = {
+      implicit val ec =
+        ExecutionContext.fromExecutor(client.getSettings.getExecutorProvider.getExecutor)
+
+      listTopicsAsync(topicName.getProject)
+        .map(_.getTopicsList.asScala)
+        .map(_.find(_.getName == topicName.fullName))
+    }
+
+    def deleteTopicAsync(topicName: TopicName): Future[Empty] =
+      client
+        .deleteTopicCallable()
+        .futureCall(DeleteTopicRequest.newBuilder().setTopicWithTopicName(topicName).build())
+
+    def listTopicSubscriptionsAsync(
+        topicName: TopicName,
+        pageSize: Option[Int] = None,
+        pageToken: Option[String] = None
+    ): Future[ListTopicSubscriptionsResponse] =
+      client
+        .listTopicSubscriptionsCallable()
+        .futureCall(
+          ListTopicSubscriptionsRequest
+            .newBuilder()
+            .setTopicWithTopicName(topicName)
+            .setPageSize(pageSize.getOrElse(0))
+            .setPageToken(pageToken.getOrElse(""))
+            .build()
+        )
+  }
+
+  implicit class ListTopicResponseExtensions(val listTopicsResponse: ListTopicsResponse)
+      extends AnyVal {
+    def topics: Seq[Topic] = listTopicsResponse.getTopicsList.asScala
+  }
+
+  implicit class ListTopicSubscriptionsResponseExtensions(
+      val listTopicSubscriptionsResponse: ListTopicSubscriptionsResponse
+  ) extends AnyVal {
+    def subscriptions: Seq[SubscriptionName] =
+      listTopicSubscriptionsResponse.getSubscriptionsListAsSubscriptionNameList.asScala
+  }
+
+  implicit class ListSubscriptionsResponseExtensions(
+      val listSubscriptionsResponse: ListSubscriptionsResponse
+  ) extends AnyVal {
+    def subscriptions: Seq[Subscription] = listSubscriptionsResponse.getSubscriptionsList.asScala
   }
 }
