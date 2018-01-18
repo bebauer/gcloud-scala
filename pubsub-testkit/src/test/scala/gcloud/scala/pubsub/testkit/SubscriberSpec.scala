@@ -2,6 +2,8 @@ package gcloud.scala.pubsub.testkit
 
 import java.util.concurrent.TimeUnit
 
+import com.google.cloud.pubsub.v1.{AckReplyConsumer, MessageReceiver}
+import com.google.pubsub.v1.PubsubMessage
 import gcloud.scala.pubsub._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
@@ -21,10 +23,17 @@ class SubscriberSpec extends WordSpec with Matchers with ScalaFutures with PubSu
 
       val messages = ArrayBuffer[String]()
 
-      val subscriber = Subscriber(subscription, (message, consumer) => {
-        messages += message.getData.toStringUtf8
-        consumer.ack()
-      }, pubSubUrl)
+      //noinspection ConvertExpressionToSAM (needed for scala 2.11)
+      val subscriber = Subscriber(
+        subscription,
+        new MessageReceiver {
+          override def receiveMessage(message: PubsubMessage, consumer: AckReplyConsumer): Unit = {
+            messages += message.getData.toStringUtf8
+            consumer.ack()
+          }
+        },
+        pubSubUrl
+      )
 
       subscriber.startAsync().awaitRunning(5, TimeUnit.SECONDS)
 
