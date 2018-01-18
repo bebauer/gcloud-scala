@@ -3,8 +3,6 @@ package gcloud.scala.pubsub.testkit
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import com.google.cloud.pubsub.v1.Publisher
-import com.google.protobuf.ByteString
 import com.google.pubsub.v1
 import com.google.pubsub.v1.PubsubMessage
 import gcloud.scala.pubsub.FutureConversions._
@@ -45,25 +43,23 @@ trait PubSubTestKit extends LocalPubSub {
   }
 
   def publishMessages[T](settings: PubSubTestSettings,
-                         messages: T*)(implicit conv: T => PubsubMessage): Unit = {
+                         messages: T*)(implicit conv: T => PubsubMessage): Seq[String] = {
     val (_, topic, _) = settings
 
-    val publisher = Publisher.newBuilder(topic).build()
+    val publisher = Publisher(topic, pubSubUrl)
 
     try {
       messages
         .map(conv)
         .map(publisher.publish)
         .map(_.asScala)
-        .foreach(Await.ready(_, publishTimeout))
+        .map(Await.result(_, publishTimeout))
     } finally {
       publisher.shutdown()
     }
   }
 
-  def pullMessages(settings: PubSubTestSettings,
-                   amount: Int,
-                   strict: Boolean = false): Seq[PubsubMessage] = {
+  def pullMessages(settings: PubSubTestSettings, amount: Int = Int.MaxValue): Seq[PubsubMessage] = {
     val (_, _, subscription) = settings
 
     val messages = collection.mutable.ArrayBuffer[PubsubMessage]()
@@ -88,9 +84,8 @@ trait PubSubTestKit extends LocalPubSub {
       }
     }
 
+    subscriber.stopAsync().awaitTerminated(10, TimeUnit.SECONDS)
+
     Seq(messages: _*).take(amount)
   }
-
-  implicit val stringToPubSubMessageConverter: String => PubsubMessage = (value: String) =>
-    PubsubMessage.newBuilder().setData(ByteString.copyFromUtf8(value)).build()
 }

@@ -1,7 +1,18 @@
 package gcloud.scala.pubsub
 
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
+import com.google.api.gax.core.ExecutorProvider
+import com.google.api.gax.grpc.{GrpcTransportChannel, InstantiatingGrpcChannelProvider}
+import com.google.api.gax.rpc.{
+  FixedTransportChannelProvider,
+  HeaderProvider,
+  TransportChannelProvider
+}
+import io.grpc.ManagedChannelBuilder
+
+import scala.concurrent.duration.Duration
 import scala.language.implicitConversions
 
 object PubSubUrl {
@@ -20,5 +31,50 @@ object PubSubUrl {
 }
 
 case class PubSubUrl(host: String, port: Int, tlsEnabled: Boolean) {
-  val url = s"$host:$port"
+  private[pubsub] def channelProviderBuilder(): ChannelProviderBuilder =
+    if (tlsEnabled) {
+      InstantiatingGrpcChannelProvider.newBuilder().setEndpoint(s"$host:$port")
+    } else {
+      new ChannelProviderBuilder {
+        private val channelBuilder = ManagedChannelBuilder
+          .forAddress(host, port)
+          .usePlaintext(true)
+
+        override def keepAliveTimeout(keepAliveTimeout: Duration): ChannelProviderBuilder = {
+          channelBuilder.keepAliveTimeout(keepAliveTimeout.toNanos, TimeUnit.NANOSECONDS)
+          this
+        }
+
+        override def keepAliveTime(keepAliveTime: Duration): ChannelProviderBuilder = {
+          channelBuilder.keepAliveTime(keepAliveTime.toNanos, TimeUnit.NANOSECONDS)
+          this
+        }
+
+        override def keepAliveWithoutCalls(
+            keepAliveWithoutCalls: Boolean
+        ): ChannelProviderBuilder = {
+          channelBuilder.keepAliveWithoutCalls(keepAliveWithoutCalls)
+          this
+        }
+
+        override def endpoint(endpoint: String): ChannelProviderBuilder = this
+
+        override def build(): TransportChannelProvider =
+          FixedTransportChannelProvider.create(GrpcTransportChannel.create(channelBuilder.build()))
+
+        override def executorProvider(
+            executorProvider: ExecutorProvider
+        ): ChannelProviderBuilder = {
+          channelBuilder.equals(executorProvider.getExecutor)
+          this
+        }
+
+        override def headerProvider(headerProvider: HeaderProvider): ChannelProviderBuilder = this
+
+        override def maxInboundMessageSize(maxInboundMessageSize: Int): ChannelProviderBuilder = {
+          channelBuilder.maxInboundMessageSize(maxInboundMessageSize)
+          this
+        }
+      }
+    }
 }

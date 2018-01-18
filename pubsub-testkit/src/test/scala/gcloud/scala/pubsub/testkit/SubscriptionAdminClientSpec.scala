@@ -1,6 +1,5 @@
 package gcloud.scala.pubsub.testkit
 
-import com.google.pubsub.v1
 import com.google.pubsub.v1.PushConfig
 import gcloud.scala.pubsub.{SubscriptionName, _}
 import org.scalatest.concurrent.ScalaFutures
@@ -67,12 +66,10 @@ class SubscriptionAdminClientSpec
       val (_, _, subscription) = newTestSetup()
 
       subscriptionAdminClient
-        .updateSubscriptionAsync(v1.Subscription
-                                   .newBuilder()
-                                   .setNameWithSubscriptionName(subscription.getSubscription)
-                                   .setAckDeadlineSeconds(60)
-                                   .build(),
-                                 None)
+        .updateSubscriptionAsync(
+          Subscription(subscription.getSubscription)
+            .setAckDeadlineSeconds(60)
+        )
         .flatMap { _ =>
           subscriptionAdminClient.getSubscriptionAsync(subscription).map {
             case Some(s) => s.getAckDeadlineSeconds shouldBe 60
