@@ -3,6 +3,7 @@ package gcloud.scala.pubsub.testkit
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+import com.google.api.gax.core.NoCredentialsProvider
 import com.google.pubsub.v1
 import com.google.pubsub.v1.PubsubMessage
 import gcloud.scala.pubsub.FutureConversions._
@@ -27,12 +28,16 @@ trait PubSubTestKit extends LocalPubSub {
 
   private val subscriptionAdminClientLazy
     : Lazy[com.google.cloud.pubsub.v1.SubscriptionAdminClient] = lazily {
-    SubscriptionAdminClient(pubSubUrl)
+    SubscriptionAdminClient(
+      SubscriptionAdminSettings(pubSubUrl).setCredentialsProvider(new NoCredentialsProvider())
+    )
   }
   lazy val subscriptionAdminClient = subscriptionAdminClientLazy()
 
   private val topicAdminClientLazy: Lazy[com.google.cloud.pubsub.v1.TopicAdminClient] = lazily {
-    TopicAdminClient(pubSubUrl)
+    TopicAdminClient(
+      TopicAdminSettings(pubSubUrl).setCredentialsProvider(new NoCredentialsProvider())
+    )
   }
   lazy val topicAdminClient = topicAdminClientLazy()
 
@@ -64,7 +69,10 @@ trait PubSubTestKit extends LocalPubSub {
                          messages: T*)(implicit conv: T => PubsubMessage): Seq[String] = {
     val (_, topic, _) = settings
 
-    val publisher = Publisher(topic, pubSubUrl)
+    val publisher = Publisher
+      .Builder(topic, pubSubUrl)
+      .setCredentialsProvider(new NoCredentialsProvider())
+      .build()
 
     try {
       messages
@@ -83,7 +91,7 @@ trait PubSubTestKit extends LocalPubSub {
     val messages = collection.mutable.ArrayBuffer[PubsubMessage]()
 
     val subscriber =
-      Subscriber(subscription, pubSubUrl) { (message, consumer) =>
+      Subscriber(subscription, pubSubUrl, new NoCredentialsProvider()) { (message, consumer) =>
         messages += message
         consumer.ack()
       }

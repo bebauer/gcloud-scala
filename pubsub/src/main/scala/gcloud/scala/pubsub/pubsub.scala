@@ -1,17 +1,14 @@
 package gcloud.scala
 
-import com.google.api.gax.core.ExecutorProvider
 import com.google.api.gax.grpc.InstantiatingGrpcChannelProvider
-import com.google.api.gax.rpc.{HeaderProvider, TransportChannelProvider}
 import com.google.cloud.pubsub.{v1 => gcv1}
 import com.google.protobuf.{ByteString, Empty, FieldMask}
 import com.google.pubsub.v1
 import com.google.pubsub.v1._
-import org.threeten.bp
+import gcloud.scala.pubsub.PubSubMessage.MessageDataEncoder
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
-import scala.concurrent.duration.Duration
 import scala.language.implicitConversions
 
 package object pubsub {
@@ -150,12 +147,14 @@ package object pubsub {
   implicit val stringToPubSubMessageConverter: String => PubsubMessage = (value: String) =>
     PubsubMessage.newBuilder().setData(ByteString.copyFromUtf8(value)).build()
 
-  implicit val pubSubMessageToPubSubMessageConverter: PubsubMessage => PubsubMessage =
-    (value: PubsubMessage) => value
+  implicit val pubSubMessageToPubSubMessageConverter: PubsubMessage.Builder => PubsubMessage =
+    builder => builder.build()
 
   type MessageDataDecoder[T] = ByteString => T
 
   implicit class PubSubMessageExtensions(val message: PubsubMessage) extends AnyVal {
     def dataAs[T](implicit decoder: MessageDataDecoder[T]): T = decoder(message.getData)
   }
+
+  implicit val stringEncoder: MessageDataEncoder[String] = value => ByteString.copyFromUtf8(value)
 }

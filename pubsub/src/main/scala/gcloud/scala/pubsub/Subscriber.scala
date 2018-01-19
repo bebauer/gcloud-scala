@@ -2,7 +2,12 @@ package gcloud.scala.pubsub
 
 import java.util.concurrent.TimeUnit
 
-import com.google.cloud.pubsub.v1.{AckReplyConsumer, MessageReceiver}
+import com.google.api.gax.core.CredentialsProvider
+import com.google.cloud.pubsub.v1.{
+  AckReplyConsumer,
+  MessageReceiver,
+  Subscriber => GCloudSubscriber
+}
 import com.google.pubsub.v1
 import com.google.pubsub.v1.PubsubMessage
 
@@ -13,17 +18,17 @@ object Subscriber {
 
   def apply(
       subscriptionName: v1.SubscriptionName
-  )(receiver: MessageReceiverType): com.google.cloud.pubsub.v1.Subscriber =
-    com.google.cloud.pubsub.v1.Subscriber
-      .newBuilder(subscriptionName, MessageReceiverWrapper(receiver))
+  )(receiver: MessageReceiverType): GCloudSubscriber =
+    Builder(subscriptionName, MessageReceiverWrapper(receiver))
 
   def apply(
       subscriptionName: v1.SubscriptionName,
       pubSubUrl: PubSubUrl = PubSubUrl.DefaultPubSubUrl,
+      credentialsProvider: CredentialsProvider =
+        com.google.cloud.pubsub.v1.SubscriptionAdminSettings.defaultCredentialsProviderBuilder.build,
       maxInboundMessageSize: Int = MaxInboundMessageSize
-  )(receiver: MessageReceiverType): com.google.cloud.pubsub.v1.Subscriber =
-    com.google.cloud.pubsub.v1.Subscriber
-      .newBuilder(subscriptionName, MessageReceiverWrapper(receiver))
+  )(receiver: MessageReceiverType): GCloudSubscriber =
+    Builder(subscriptionName, MessageReceiverWrapper(receiver))
       .setChannelProvider(
         pubSubUrl
           .channelProviderBuilder()
@@ -31,6 +36,13 @@ object Subscriber {
           .keepAliveTime(5, TimeUnit.SECONDS)
           .build()
       )
+      .setCredentialsProvider(credentialsProvider)
+
+  object Builder {
+    def apply(subscriptionName: v1.SubscriptionName,
+              receiver: MessageReceiver): GCloudSubscriber.Builder =
+      GCloudSubscriber.newBuilder(subscriptionName, receiver)
+  }
 
   private object MessageReceiverWrapper {
     def apply(receiver: MessageReceiverType): MessageReceiverWrapper =

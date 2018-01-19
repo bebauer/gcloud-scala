@@ -2,6 +2,7 @@ package gcloud.scala.pubsub.testkit
 
 import java.util.concurrent.TimeUnit
 
+import com.google.api.gax.core.NoCredentialsProvider
 import gcloud.scala.pubsub._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
@@ -24,9 +25,11 @@ class SubscriberSpec extends WordSpec with Matchers with ScalaFutures with PubSu
 
       implicit val stringDecoder: MessageDataDecoder[String] = _.toStringUtf8
 
-      val subscriber = Subscriber(subscription, pubSubUrl) { (message, consumer) =>
-        messages += message.dataAs[String]
-        consumer.ack()
+      val subscriber = Subscriber(subscription, pubSubUrl, new NoCredentialsProvider()) {
+        (message, consumer) =>
+          println(message.dataAs[String])
+          messages += message.dataAs[String]
+          consumer.ack()
       }
 
       subscriber.startAsync().awaitRunning(5, TimeUnit.SECONDS)

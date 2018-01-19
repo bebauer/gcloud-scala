@@ -1,5 +1,6 @@
 package gcloud.scala.pubsub.testkit
 
+import com.google.api.gax.core.NoCredentialsProvider
 import gcloud.scala.pubsub._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
@@ -17,12 +18,13 @@ class PublisherSpec extends WordSpec with Matchers with ScalaFutures with PubSub
       val settings      = newTestSetup()
       val (_, topic, _) = settings
 
-      val publisher = Publisher(topic, pubSubUrl)
+      val publisher = Publisher(topic, pubSubUrl, new NoCredentialsProvider())
 
       try {
-        Await.result(publisher.publishAsync("Test"), 5.seconds)
+        publisher.publishAsync("Test1")
+        publisher.publishAsync(PubSubMessage("Test2"))
 
-        pullMessages(settings).map(_.getData.toStringUtf8) shouldEqual Seq("Test")
+        pullMessages(settings, 2).map(_.getData.toStringUtf8) should contain only ("Test1", "Test2")
       } finally {
         publisher.shutdown()
       }
