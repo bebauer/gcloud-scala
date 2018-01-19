@@ -15,7 +15,7 @@ object Subscriber {
 
   def apply(
       subscriptionName: v1.SubscriptionName,
-      messageReceiver: com.google.cloud.pubsub.v1.MessageReceiver,
+      messageReceiver: MessageReceiver,
       pubSubUrl: PubSubUrl = PubSubUrl.DefaultPubSubUrl,
       maxInboundMessageSize: Int = MaxInboundMessageSize
   ): com.google.cloud.pubsub.v1.Subscriber =

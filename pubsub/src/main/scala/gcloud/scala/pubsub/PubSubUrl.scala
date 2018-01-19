@@ -35,46 +35,6 @@ case class PubSubUrl(host: String, port: Int, tlsEnabled: Boolean) {
     if (tlsEnabled) {
       InstantiatingGrpcChannelProvider.newBuilder().setEndpoint(s"$host:$port")
     } else {
-      new ChannelProviderBuilder {
-        private val channelBuilder = ManagedChannelBuilder
-          .forAddress(host, port)
-          .usePlaintext(true)
-
-        override def keepAliveTimeout(keepAliveTimeout: Duration): ChannelProviderBuilder = {
-          channelBuilder.keepAliveTimeout(keepAliveTimeout.toNanos, TimeUnit.NANOSECONDS)
-          this
-        }
-
-        override def keepAliveTime(keepAliveTime: Duration): ChannelProviderBuilder = {
-          channelBuilder.keepAliveTime(keepAliveTime.toNanos, TimeUnit.NANOSECONDS)
-          this
-        }
-
-        override def keepAliveWithoutCalls(
-            keepAliveWithoutCalls: Boolean
-        ): ChannelProviderBuilder = {
-          channelBuilder.keepAliveWithoutCalls(keepAliveWithoutCalls)
-          this
-        }
-
-        override def endpoint(endpoint: String): ChannelProviderBuilder = this
-
-        override def build(): TransportChannelProvider =
-          FixedTransportChannelProvider.create(GrpcTransportChannel.create(channelBuilder.build()))
-
-        override def executorProvider(
-            executorProvider: ExecutorProvider
-        ): ChannelProviderBuilder = {
-          channelBuilder.equals(executorProvider.getExecutor)
-          this
-        }
-
-        override def headerProvider(headerProvider: HeaderProvider): ChannelProviderBuilder = this
-
-        override def maxInboundMessageSize(maxInboundMessageSize: Int): ChannelProviderBuilder = {
-          channelBuilder.maxInboundMessageSize(maxInboundMessageSize)
-          this
-        }
-      }
+      FixedAutoClosableChannelProviderBuilder(host, port)
     }
 }

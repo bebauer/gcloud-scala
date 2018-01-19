@@ -6,11 +6,11 @@ object ProjectName {
   private val ProjectNamePattern = "(projects/)?(.+)".r
 
   /**
-    * Creates a [[ProjectName]] by parsing a name string.
+    * Creates a [[v1.ProjectName]] by parsing a name string.
     * The name can be specified with or without the 'projects/' prefix.
     *
     * @param name the project name
-    * @return the [[ProjectName]]
+    * @return the [[v1.ProjectName]]
     * @throws IllegalArgumentException if the name cannot be parsed
     */
   def apply(name: String): v1.ProjectName =

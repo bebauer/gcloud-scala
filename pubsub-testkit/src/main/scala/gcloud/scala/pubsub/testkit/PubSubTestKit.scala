@@ -8,11 +8,13 @@ import com.google.pubsub.v1
 import com.google.pubsub.v1.PubsubMessage
 import gcloud.scala.pubsub.FutureConversions._
 import gcloud.scala.pubsub._
+import gcloud.scala.pubsub.testkit.Lazy._
 import org.scalatest.Suite
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.language.implicitConversions
+import scala.util.Try
 
 trait PubSubTestKit extends LocalPubSub {
   this: Suite =>
@@ -24,12 +26,28 @@ trait PubSubTestKit extends LocalPubSub {
 
   def pubSubUrl: String = pubSubEmulatorUrl
 
-  lazy val subscriptionAdminClient = SubscriptionAdminClient(pubSubUrl)
-  lazy val topicAdminClient        = TopicAdminClient(pubSubUrl)
+  private val subscriptionAdminClientLazy
+    : Lazy[com.google.cloud.pubsub.v1.SubscriptionAdminClient] = lazily {
+    SubscriptionAdminClient(pubSubUrl)
+  }
+  lazy val subscriptionAdminClient = subscriptionAdminClientLazy()
+
+  private val topicAdminClientLazy: Lazy[com.google.cloud.pubsub.v1.TopicAdminClient] = lazily {
+    TopicAdminClient(pubSubUrl)
+  }
+  lazy val topicAdminClient = topicAdminClientLazy()
 
   val createTimeout: FiniteDuration  = 10.seconds
-  val pullTimeout: FiniteDuration    = 10.seconds
   val publishTimeout: FiniteDuration = 10.seconds
+
+  override protected def afterAll(): Unit = {
+    Try {
+      topicAdminClientLazy.foreach(_.close())
+      subscriptionAdminClientLazy.foreach(_.close())
+    }
+
+    super.afterAll()
+  }
 
   def newTestSetup(): PubSubTestSettings = {
     val project      = ProjectName(s"test-${UUID.randomUUID().toString}")

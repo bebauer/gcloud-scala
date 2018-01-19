@@ -6,11 +6,11 @@ object SubscriptionName {
   private val SubscriptionNamePattern = "projects/(.+)/subscriptions/(.+)".r
 
   /**
-    * Creates a [[SubscriptionName]] by parsing the full name
+    * Creates a [[v1.SubscriptionName]] by parsing the full name
     * (projects/{project}/subscriptions/{subscription}) string.
     *
     * @param fullName the full name string
-    * @return the [[SubscriptionName]]
+    * @return the [[v1.SubscriptionName]]
     * @throws IllegalArgumentException if the full name cannot be parsed
     */
   def apply(fullName: String): v1.SubscriptionName = fullName match {
@@ -23,16 +23,16 @@ object SubscriptionName {
   }
 
   /**
-    * Creates a [[SubscriptionName]] from a [[ProjectName]] and a subscription name.
+    * Creates a [[v1.SubscriptionName]] from a [[v1.ProjectName]] and a subscription name.
     *
-    * @param projectName the [[ProjectName]]
-    * @param name the subscription name
-    * @return the [[SubscriptionName]]
+    * @param projectName the [[v1.ProjectName]]
+    * @param subscriptionName the subscription name
+    * @return the [[v1.SubscriptionName]]
     */
-  def apply(projectName: v1.ProjectName, name: String): v1.SubscriptionName =
+  def apply(projectName: v1.ProjectName, subscriptionName: String): v1.SubscriptionName =
     v1.SubscriptionName
       .newBuilder()
       .setProject(projectName.getProject)
-      .setSubscription(name)
+      .setSubscription(subscriptionName)
       .build()
 }
