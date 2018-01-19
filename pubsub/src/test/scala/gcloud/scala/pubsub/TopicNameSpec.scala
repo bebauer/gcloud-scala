@@ -1,5 +1,6 @@
 package gcloud.scala.pubsub
 
+import com.google.pubsub.v1
 import org.scalatest.{Matchers, WordSpec}
 
 class TopicNameSpec extends WordSpec with Matchers {
@@ -9,15 +10,15 @@ class TopicNameSpec extends WordSpec with Matchers {
     "be created from full name" in {
       val tn = TopicName("projects/tp/topics/tt")
 
-      tn.projectName.name shouldBe "tp"
-      tn.name shouldBe "tt"
+      tn.getProject shouldBe "tp"
+      tn.getTopic shouldBe "tt"
     }
 
     "be created implicitly from string" in {
-      val tn: TopicName = "projects/tp/topics/tt"
+      val tn: v1.TopicName = "projects/tp/topics/tt"
 
-      tn.projectName.name shouldBe "tp"
-      tn.name shouldBe "tt"
+      tn.getProject shouldBe "tp"
+      tn.getTopic shouldBe "tt"
     }
 
     "fail on invalid name" in {
@@ -27,8 +28,8 @@ class TopicNameSpec extends WordSpec with Matchers {
     "be created from project and subscription names" in {
       val tn = TopicName(ProjectName("tp"), "tt")
 
-      tn.projectName.name shouldBe "tp"
-      tn.name shouldBe "tt"
+      tn.getProject shouldBe "tp"
+      tn.getTopic shouldBe "tt"
     }
   }
 }

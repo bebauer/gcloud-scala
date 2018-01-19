@@ -2,7 +2,7 @@ lazy val `gcloud-scala` = (project in file("."))
   .settings(
     inThisBuild(commonSettings)
   )
-  .aggregate(`gcloud-scala-proto`, `gcloud-scala-pubsub`, `gcloud-scala-pubsub-testkit`)
+  .aggregate(`gcloud-scala-pubsub`, `gcloud-scala-pubsub-testkit`)
   .settings(
     publish := {},
     publishLocal := {}
@@ -11,36 +11,11 @@ lazy val `gcloud-scala` = (project in file("."))
 lazy val `gcloud-scala-pubsub` =
   (project in file("pubsub"))
     .settings(libraryDependencies ++= Dependencies.pubSub)
-    .dependsOn(`gcloud-scala-proto`)
 
 lazy val `gcloud-scala-pubsub-testkit` =
   (project in file("pubsub-testkit"))
     .settings(libraryDependencies ++= Dependencies.pubSubTestKit)
     .dependsOn(`gcloud-scala-pubsub`)
-
-lazy val `gcloud-scala-proto` = (project in file("proto")).settings(
-  fetchProtos := {
-    if (java.nio.file.Files.notExists(new File("proto/target/protobuf").toPath)) {
-      println("Path does not exist, downloading...")
-      IO.unzipURL(
-        from = new URL("https://github.com/googleapis/googleapis/archive/master.zip"),
-        toDirectory = new File("proto/target/protobuf"),
-        filter = "googleapis-master/google/api/*" | "googleapis-master/google/pubsub/v1/*" | "googleapis-master/google/rpc/*" |
-        "googleapis-master/google/type/*" | "googleapis-master/google/logging/*" | "googleapis-master/google/longrunning/*"
-      )
-    } else {
-      println("Path exists, no need to download.")
-    }
-  },
-  compile in Compile := (compile in Compile).dependsOn(fetchProtos).value,
-  libraryDependencies ++= Dependencies.proto,
-  PB.targets in Compile := Seq(
-    scalapb.gen(flatPackage = true) -> (sourceManaged in Compile).value
-  ),
-  PB.protoSources in Compile += target.value / "protobuf" / "googleapis-master"
-)
-
-lazy val fetchProtos = taskKey[Unit]("Download Google protos and extract to target.")
 
 lazy val commonSettings = Seq(
   organization := "gcloud-scala",

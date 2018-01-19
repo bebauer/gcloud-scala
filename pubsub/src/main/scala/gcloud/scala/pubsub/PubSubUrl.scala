@@ -1,7 +1,18 @@
 package gcloud.scala.pubsub
 
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
+import com.google.api.gax.core.ExecutorProvider
+import com.google.api.gax.grpc.{GrpcTransportChannel, InstantiatingGrpcChannelProvider}
+import com.google.api.gax.rpc.{
+  FixedTransportChannelProvider,
+  HeaderProvider,
+  TransportChannelProvider
+}
+import io.grpc.ManagedChannelBuilder
+
+import scala.concurrent.duration.Duration
 import scala.language.implicitConversions
 
 object PubSubUrl {
@@ -19,4 +30,11 @@ object PubSubUrl {
   }
 }
 
-case class PubSubUrl(host: String, port: Int, tlsEnabled: Boolean)
+case class PubSubUrl(host: String, port: Int, tlsEnabled: Boolean) {
+  private[pubsub] def channelProviderBuilder(): ChannelProviderBuilder =
+    if (tlsEnabled) {
+      InstantiatingGrpcChannelProvider.newBuilder().setEndpoint(s"$host:$port")
+    } else {
+      FixedAutoClosableChannelProviderBuilder(host, port)
+    }
+}
