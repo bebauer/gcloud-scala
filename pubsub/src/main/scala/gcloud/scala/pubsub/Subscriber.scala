@@ -2,25 +2,28 @@ package gcloud.scala.pubsub
 
 import java.util.concurrent.TimeUnit
 
-import com.google.cloud.pubsub.v1.MessageReceiver
+import com.google.cloud.pubsub.v1.{AckReplyConsumer, MessageReceiver}
 import com.google.pubsub.v1
+import com.google.pubsub.v1.PubsubMessage
 
 object Subscriber {
   private final val MaxInboundMessageSize = 20 * 1024 * 1024 // 20MB API maximum message size.
 
-  def apply(subscriptionName: v1.SubscriptionName,
-            messageReceiver: MessageReceiver): com.google.cloud.pubsub.v1.Subscriber =
+  type MessageReceiverType = (PubsubMessage, AckReplyConsumer) => Unit
+
+  def apply(
+      subscriptionName: v1.SubscriptionName
+  )(receiver: MessageReceiverType): com.google.cloud.pubsub.v1.Subscriber =
     com.google.cloud.pubsub.v1.Subscriber
-      .newBuilder(subscriptionName, messageReceiver)
+      .newBuilder(subscriptionName, MessageReceiverWrapper(receiver))
 
   def apply(
       subscriptionName: v1.SubscriptionName,
-      messageReceiver: MessageReceiver,
       pubSubUrl: PubSubUrl = PubSubUrl.DefaultPubSubUrl,
       maxInboundMessageSize: Int = MaxInboundMessageSize
-  ): com.google.cloud.pubsub.v1.Subscriber =
+  )(receiver: MessageReceiverType): com.google.cloud.pubsub.v1.Subscriber =
     com.google.cloud.pubsub.v1.Subscriber
-      .newBuilder(subscriptionName, messageReceiver)
+      .newBuilder(subscriptionName, MessageReceiverWrapper(receiver))
       .setChannelProvider(
         pubSubUrl
           .channelProviderBuilder()
@@ -28,4 +31,14 @@ object Subscriber {
           .keepAliveTime(5, TimeUnit.SECONDS)
           .build()
       )
+
+  private object MessageReceiverWrapper {
+    def apply(receiver: MessageReceiverType): MessageReceiverWrapper =
+      new MessageReceiverWrapper(receiver)
+  }
+
+  private class MessageReceiverWrapper(receiver: MessageReceiverType) extends MessageReceiver {
+    override def receiveMessage(message: PubsubMessage, consumer: AckReplyConsumer): Unit =
+      receiver(message, consumer)
+  }
 }

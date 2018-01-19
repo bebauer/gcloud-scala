@@ -3,7 +3,6 @@ package gcloud.scala.pubsub.testkit
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
-import com.google.cloud.pubsub.v1.{AckReplyConsumer, MessageReceiver}
 import com.google.pubsub.v1
 import com.google.pubsub.v1.PubsubMessage
 import gcloud.scala.pubsub.FutureConversions._
@@ -83,18 +82,11 @@ trait PubSubTestKit extends LocalPubSub {
 
     val messages = collection.mutable.ArrayBuffer[PubsubMessage]()
 
-    //noinspection ConvertExpressionToSAM (needed for scala 2.11)
     val subscriber =
-      Subscriber(
-        subscription,
-        new MessageReceiver {
-          override def receiveMessage(message: PubsubMessage, consumer: AckReplyConsumer): Unit = {
-            messages += message
-            consumer.ack()
-          }
-        },
-        pubSubUrl
-      )
+      Subscriber(subscription, pubSubUrl) { (message, consumer) =>
+        messages += message
+        consumer.ack()
+      }
 
     subscriber.startAsync().awaitRunning(10, TimeUnit.SECONDS)
 

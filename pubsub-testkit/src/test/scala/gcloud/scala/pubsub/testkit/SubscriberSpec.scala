@@ -2,14 +2,13 @@ package gcloud.scala.pubsub.testkit
 
 import java.util.concurrent.TimeUnit
 
-import com.google.cloud.pubsub.v1.{AckReplyConsumer, MessageReceiver}
-import com.google.pubsub.v1.PubsubMessage
 import gcloud.scala.pubsub._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.duration._
 
 class SubscriberSpec extends WordSpec with Matchers with ScalaFutures with PubSubTestKit {
 
@@ -23,24 +22,21 @@ class SubscriberSpec extends WordSpec with Matchers with ScalaFutures with PubSu
 
       val messages = ArrayBuffer[String]()
 
-      //noinspection ConvertExpressionToSAM (needed for scala 2.11)
-      val subscriber = Subscriber(
-        subscription,
-        new MessageReceiver {
-          override def receiveMessage(message: PubsubMessage, consumer: AckReplyConsumer): Unit = {
-            messages += message.getData.toStringUtf8
-            consumer.ack()
-          }
-        },
-        pubSubUrl
-      )
+      implicit val stringDecoder: MessageDataDecoder[String] = _.toStringUtf8
+
+      val subscriber = Subscriber(subscription, pubSubUrl) { (message, consumer) =>
+        messages += message.dataAs[String]
+        consumer.ack()
+      }
 
       subscriber.startAsync().awaitRunning(5, TimeUnit.SECONDS)
 
       publishMessages(settings, "TEST1", "TEST2", "TEST3") should have size 3
 
+      implicit val patienceConfig = PatienceConfig(10.seconds, 500.milliseconds)
+
       eventually {
-        messages shouldEqual Seq("TEST1", "TEST2", "TEST3")
+        messages should contain only ("TEST1", "TEST2", "TEST3")
       }
 
       subscriber.stopAsync().awaitTerminated(5, TimeUnit.SECONDS)

@@ -128,6 +128,11 @@ package object pubsub {
     def subscriptions: Seq[Subscription] = listSubscriptionsResponse.getSubscriptionsList.asScala
   }
 
+  implicit class PublisherExtensions(val publisher: gcv1.Publisher) extends AnyVal {
+    def publishAsync[T](message: T)(implicit converter: T => PubsubMessage): Future[String] =
+      Publisher.Logic.publishAsync(publisher, message)
+  }
+
   implicit def subscriptionBuilderToInstance(builder: v1.Subscription.Builder): v1.Subscription =
     builder.build()
 
@@ -142,14 +147,15 @@ package object pubsub {
   ): ChannelProviderBuilder =
     InstantiatingChannelProviderBuilder(builder)
 
-  implicit class PublisherExtensions(val publisher: gcv1.Publisher) extends AnyVal {
-    def publishAsync[T](message: T)(implicit converter: T => PubsubMessage): Future[String] =
-      Publisher.Logic.publishAsync(publisher, message)
-  }
-
   implicit val stringToPubSubMessageConverter: String => PubsubMessage = (value: String) =>
     PubsubMessage.newBuilder().setData(ByteString.copyFromUtf8(value)).build()
 
   implicit val pubSubMessageToPubSubMessageConverter: PubsubMessage => PubsubMessage =
     (value: PubsubMessage) => value
+
+  type MessageDataDecoder[T] = ByteString => T
+
+  implicit class PubSubMessageExtensions(val message: PubsubMessage) extends AnyVal {
+    def dataAs[T](implicit decoder: MessageDataDecoder[T]): T = decoder(message.getData)
+  }
 }
