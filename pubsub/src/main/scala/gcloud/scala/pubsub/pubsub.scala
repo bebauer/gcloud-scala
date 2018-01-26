@@ -1,12 +1,10 @@
 package gcloud.scala
 
-import com.google.api.core.ApiFuture
 import com.google.api.gax.grpc.InstantiatingGrpcChannelProvider
 import com.google.cloud.pubsub.{v1 => gcv1}
 import com.google.protobuf.{ByteString, Empty, FieldMask}
 import com.google.pubsub.v1
 import com.google.pubsub.v1._
-import gcloud.scala.pubsub.FutureConversions._
 import gcloud.scala.pubsub.PubSubMessage.MessageDataEncoder
 
 import scala.collection.JavaConverters._
@@ -160,5 +158,11 @@ package object pubsub {
 
   implicit val stringEncoder: MessageDataEncoder[String] = value => ByteString.copyFromUtf8(value)
 
-  implicit def apiFutureToScalaFuture[T](future: ApiFuture[T]): Future[T] = future.asScala
+  implicit class SubscriberBuilderExtensions(val builder: gcv1.Subscriber.Builder) extends AnyVal {
+    def setChannelProviderWithUrl(
+        pubSubUrl: PubSubUrl,
+        maxInboundMessageSize: Int = Subscriber.MaxInboundMessageSize
+    ): gcv1.Subscriber.Builder =
+      Subscriber.Builder.Logic.setChannelProviderWithUrl(builder, pubSubUrl, maxInboundMessageSize)
+  }
 }

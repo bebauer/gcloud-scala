@@ -12,7 +12,7 @@ import com.google.pubsub.v1
 import com.google.pubsub.v1.PubsubMessage
 
 object Subscriber {
-  private final val MaxInboundMessageSize = 20 * 1024 * 1024 // 20MB API maximum message size.
+  private[pubsub] final val MaxInboundMessageSize = 20 * 1024 * 1024 // 20MB API maximum message size.
 
   type MessageReceiverType = (PubsubMessage, AckReplyConsumer) => Unit
 
@@ -29,19 +29,28 @@ object Subscriber {
       maxInboundMessageSize: Int = MaxInboundMessageSize
   )(receiver: MessageReceiverType): GCloudSubscriber =
     Builder(subscriptionName, MessageReceiverWrapper(receiver))
-      .setChannelProvider(
-        pubSubUrl
-          .channelProviderBuilder()
-          .maxInboundMessageSize(maxInboundMessageSize)
-          .keepAliveTime(5, TimeUnit.SECONDS)
-          .build()
-      )
+      .setChannelProviderWithUrl(pubSubUrl, maxInboundMessageSize)
       .setCredentialsProvider(credentialsProvider)
 
   object Builder {
     def apply(subscriptionName: v1.SubscriptionName,
               receiver: MessageReceiver): GCloudSubscriber.Builder =
       GCloudSubscriber.newBuilder(subscriptionName, receiver)
+
+    private[pubsub] object Logic {
+      def setChannelProviderWithUrl(
+          builder: GCloudSubscriber.Builder,
+          pubSubUrl: PubSubUrl,
+          maxInboundMessageSize: Int = MaxInboundMessageSize
+      ): GCloudSubscriber.Builder =
+        builder.setChannelProvider(
+          pubSubUrl
+            .channelProviderBuilder()
+            .maxInboundMessageSize(maxInboundMessageSize)
+            .keepAliveTime(5, TimeUnit.SECONDS)
+            .build()
+        )
+    }
   }
 
   private object MessageReceiverWrapper {

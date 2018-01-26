@@ -4,7 +4,7 @@ import com.google.api.core.{ApiFuture, ApiFutureCallback, ApiFutures}
 
 import scala.concurrent.{Future, Promise}
 
-object FutureConversions {
+private[pubsub] object FutureConversions {
 
   implicit class ApiFutureConversion[T](val future: ApiFuture[T]) extends AnyVal {
     def asScala: Future[T] = {
