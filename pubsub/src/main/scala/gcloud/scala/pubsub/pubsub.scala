@@ -6,9 +6,11 @@ import com.google.protobuf.{ByteString, Empty, FieldMask}
 import com.google.pubsub.v1
 import com.google.pubsub.v1._
 import gcloud.scala.pubsub.PubSubMessage.MessageDataEncoder
+import org.threeten.bp.Duration
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
+import scala.concurrent.duration.FiniteDuration
 import scala.language.implicitConversions
 
 package object pubsub {
@@ -165,4 +167,7 @@ package object pubsub {
     ): gcv1.Subscriber.Builder =
       Subscriber.Builder.Logic.setChannelProviderWithUrl(builder, pubSubUrl, maxInboundMessageSize)
   }
+
+  implicit def finiteDurationToBpDuration(duration: FiniteDuration): Duration =
+    Duration.ofNanos(duration.toNanos)
 }
