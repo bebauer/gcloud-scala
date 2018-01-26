@@ -116,7 +116,7 @@ package object pubsub {
       val listTopicSubscriptionsResponse: ListTopicSubscriptionsResponse
   ) extends AnyVal {
     def subscriptions: Seq[SubscriptionName] =
-      listTopicSubscriptionsResponse.getSubscriptionsListAsSubscriptionNameList.asScala
+      v1.SubscriptionName.parseList(listTopicSubscriptionsResponse.getSubscriptionsList).asScala
   }
 
   implicit class ListSubscriptionsResponseExtensions(

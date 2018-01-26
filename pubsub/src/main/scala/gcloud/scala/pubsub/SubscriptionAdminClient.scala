@@ -58,7 +58,7 @@ object SubscriptionAdminClient {
         .futureCall(
           DeleteSubscriptionRequest
             .newBuilder()
-            .setSubscriptionWithSubscriptionName(subscriptionName)
+            .setSubscription(subscriptionName.toString)
             .build()
         )
 
@@ -73,7 +73,7 @@ object SubscriptionAdminClient {
         .futureCall(
           ListSubscriptionsRequest
             .newBuilder()
-            .setProjectWithProjectName(projectName)
+            .setProject(projectName.toString)
             .setPageSize(pageSize.getOrElse(0))
             .setPageToken(pageToken.getOrElse(""))
             .build()
@@ -87,7 +87,7 @@ object SubscriptionAdminClient {
         .futureCall(
           ModifyPushConfigRequest
             .newBuilder()
-            .setSubscriptionWithSubscriptionName(subscriptionName)
+            .setSubscription(subscriptionName.toString)
             .setPushConfig(pushConfig)
             .build()
         )

@@ -29,7 +29,7 @@ object TopicAdminClient {
         .futureCall(
           ListTopicsRequest
             .newBuilder()
-            .setProjectWithProjectName(projectName)
+            .setProject(projectName.toString)
             .setPageSize(pageSize.getOrElse(0))
             .setPageToken(pageToken.getOrElse(""))
             .build()
@@ -50,7 +50,7 @@ object TopicAdminClient {
     def deleteTopicAsync(client: TopicAdminClient, topicName: TopicName): Future[Empty] =
       client
         .deleteTopicCallable()
-        .futureCall(DeleteTopicRequest.newBuilder().setTopicWithTopicName(topicName).build())
+        .futureCall(DeleteTopicRequest.newBuilder().setTopic(topicName.toString).build())
 
     def listTopicSubscriptionsAsync(
         client: TopicAdminClient,
@@ -63,7 +63,7 @@ object TopicAdminClient {
         .futureCall(
           ListTopicSubscriptionsRequest
             .newBuilder()
-            .setTopicWithTopicName(topicName)
+            .setTopic(topicName.toString)
             .setPageSize(pageSize.getOrElse(0))
             .setPageToken(pageToken.getOrElse(""))
             .build()
