@@ -4,15 +4,18 @@ import com.google.pubsub.v1.PushConfig
 import gcloud.scala.pubsub.{SubscriptionName, _}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{AsyncWordSpec, Matchers}
+import org.scalatest.{Matchers, OptionValues, WordSpec}
 
 import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.duration._
 
 class SubscriptionAdminClientSpec
-    extends AsyncWordSpec
+    extends WordSpec
     with Matchers
     with ScalaFutures
-    with PubSubTestKit {
+    with OptionValues
+    with PubSubTestKit
+    with DockerPubSub {
 
   override implicit val executionContext: ExecutionContextExecutor =
     scala.concurrent.ExecutionContext.global
@@ -20,7 +23,7 @@ class SubscriptionAdminClientSpec
   override implicit val patienceConfig =
     PatienceConfig(timeout = Span(60, Seconds), interval = Span(500, Millis))
 
-  "The PubSubSubscriber" should {
+  "The SubscriptionAdminClient" should {
 
     "create a subscription" in {
       val (project, topic, _) = newTestSetup()
@@ -36,54 +39,54 @@ class SubscriptionAdminClientSpec
     "get existing subscription" in {
       val (_, _, subscription) = newTestSetup()
 
-      subscriptionAdminClient.getSubscriptionAsync(subscription).map {
-        case Some(s) => s.getName shouldBe subscription.fullName
-        case None    => fail()
-      }
+      subscriptionAdminClient
+        .getSubscriptionAsync(subscription)
+        .futureValue
+        .value
+        .getName shouldBe subscription.fullName
     }
 
     "get non existing subscription" in {
       val (project, _, _) = newTestSetup()
 
-      subscriptionAdminClient.getSubscriptionAsync(SubscriptionName(project, "doesnotexist")).map {
-        case None    => succeed
-        case Some(_) => fail()
-      }
+      subscriptionAdminClient
+        .getSubscriptionAsync(SubscriptionName(project, "doesnotexist"))
+        .futureValue shouldBe None
     }
 
     "delete subscription" in {
       val (_, _, subscription) = newTestSetup()
 
-      subscriptionAdminClient.deleteSubscriptionAsync(subscription).flatMap { _ =>
-        subscriptionAdminClient.getSubscriptionAsync(subscription).map {
-          case None    => succeed
-          case Some(_) => fail()
-        }
+      whenReady(subscriptionAdminClient.deleteSubscriptionAsync(subscription)) { _ =>
+        subscriptionAdminClient.getSubscriptionAsync(subscription).futureValue shouldBe None
       }
     }
 
     "update subscription" ignore {
       val (_, _, subscription) = newTestSetup()
 
-      subscriptionAdminClient
-        .updateSubscriptionAsync(
-          Subscription(subscription.getSubscription)
-            .setAckDeadlineSeconds(60)
-        )
-        .flatMap { _ =>
-          subscriptionAdminClient.getSubscriptionAsync(subscription).map {
-            case Some(s) => s.getAckDeadlineSeconds shouldBe 60
-            case None    => fail()
-          }
-        }
+      whenReady(
+        subscriptionAdminClient
+          .updateSubscriptionAsync(
+            Subscription(subscription.getSubscription)
+              .setAckDeadlineSeconds(60)
+          )
+      ) { _ =>
+        subscriptionAdminClient
+          .getSubscriptionAsync(subscription)
+          .futureValue
+          .value
+          .getAckDeadlineSeconds shouldBe 60
+      }
     }
 
     "list subscriptions" in {
       val (project, _, _) = newTestSetup()
 
-      subscriptionAdminClient.listSubscriptionsAsync(project).map { result =>
-        result.subscriptions should have size 1
-      }
+      subscriptionAdminClient
+        .listSubscriptionsAsync(project)
+        .futureValue
+        .subscriptions should have size 1
     }
 
     "modify push config" in {
@@ -94,7 +97,7 @@ class SubscriptionAdminClientSpec
           subscription,
           PushConfig.newBuilder().setPushEndpoint("http://localhost:9999").build()
         )
-        .map(_ => succeed)
+        .isReadyWithin(5.seconds)
     }
   }
 }

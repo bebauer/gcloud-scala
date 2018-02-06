@@ -1,18 +1,9 @@
 package gcloud.scala.pubsub
 
 import java.net.URL
-import java.util.concurrent.TimeUnit
 
-import com.google.api.gax.core.ExecutorProvider
-import com.google.api.gax.grpc.{GrpcTransportChannel, InstantiatingGrpcChannelProvider}
-import com.google.api.gax.rpc.{
-  FixedTransportChannelProvider,
-  HeaderProvider,
-  TransportChannelProvider
-}
-import io.grpc.ManagedChannelBuilder
+import com.google.api.gax.grpc.InstantiatingGrpcChannelProvider
 
-import scala.concurrent.duration.Duration
 import scala.language.implicitConversions
 
 object PubSubUrl {

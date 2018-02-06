@@ -9,15 +9,15 @@ import com.google.pubsub.v1.PubsubMessage
 import gcloud.scala.pubsub.FutureConversions._
 import gcloud.scala.pubsub._
 import gcloud.scala.pubsub.testkit.Lazy._
-import org.scalatest.Suite
+import org.scalatest.{BeforeAndAfterAll, Suite}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.language.implicitConversions
 import scala.util.Try
 
-trait PubSubTestKit extends LocalPubSub {
-  this: Suite =>
+trait PubSubTestKit extends BeforeAndAfterAll {
+  this: Suite with PubSubEmulator =>
 
   type PubSubTestSettings = (v1.ProjectName, v1.TopicName, v1.SubscriptionName)
 
@@ -32,14 +32,14 @@ trait PubSubTestKit extends LocalPubSub {
       SubscriptionAdminSettings(pubSubUrl).setCredentialsProvider(new NoCredentialsProvider())
     )
   }
-  lazy val subscriptionAdminClient = subscriptionAdminClientLazy()
+  def subscriptionAdminClient = subscriptionAdminClientLazy()
 
   private val topicAdminClientLazy: Lazy[com.google.cloud.pubsub.v1.TopicAdminClient] = lazily {
     TopicAdminClient(
       TopicAdminSettings(pubSubUrl).setCredentialsProvider(new NoCredentialsProvider())
     )
   }
-  lazy val topicAdminClient = topicAdminClientLazy()
+  def topicAdminClient = topicAdminClientLazy()
 
   val createTimeout: FiniteDuration  = 10.seconds
   val publishTimeout: FiniteDuration = 10.seconds

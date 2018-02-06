@@ -4,14 +4,20 @@ import java.util.concurrent.TimeUnit
 
 import com.google.api.gax.core.NoCredentialsProvider
 import gcloud.scala.pubsub._
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
-class SubscriberSpec extends WordSpec with Matchers with ScalaFutures with PubSubTestKit {
+class SubscriberSpec
+    extends WordSpec
+    with Matchers
+    with ScalaFutures
+    with Eventually
+    with PubSubTestKit
+    with DockerPubSub {
 
   override implicit val executionContext: ExecutionContextExecutor =
     scala.concurrent.ExecutionContext.global

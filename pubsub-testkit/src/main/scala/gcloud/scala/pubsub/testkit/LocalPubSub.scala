@@ -17,7 +17,7 @@ object LocalPubSub {
   case class PubSubEnvironment(host: String, port: Int)
 }
 
-trait LocalPubSub extends BeforeAndAfterAll with Eventually with Matchers {
+trait LocalPubSub extends PubSubEmulator with BeforeAndAfterAll with Eventually with Matchers {
   this: Suite =>
 
   import LocalPubSub._
@@ -30,7 +30,7 @@ trait LocalPubSub extends BeforeAndAfterAll with Eventually with Matchers {
 
   private var started = false
 
-  def pubSubEmulatorUrl = s"http://${pubSubEnvironment.host}:${pubSubEnvironment.port}"
+  override def pubSubEmulatorUrl = s"http://${pubSubEnvironment.host}:${pubSubEnvironment.port}"
 
   override protected def beforeAll(): Unit = {
     logger.info("Starting pubsub emulator")

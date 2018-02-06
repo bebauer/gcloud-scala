@@ -5,10 +5,14 @@ import gcloud.scala.pubsub._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.concurrent.{Await, ExecutionContextExecutor}
-import scala.concurrent.duration._
+import scala.concurrent.ExecutionContextExecutor
 
-class PublisherSpec extends WordSpec with Matchers with ScalaFutures with PubSubTestKit {
+class PublisherSpec
+    extends WordSpec
+    with Matchers
+    with ScalaFutures
+    with PubSubTestKit
+    with DockerPubSub {
 
   override implicit val executionContext: ExecutionContextExecutor =
     scala.concurrent.ExecutionContext.global
