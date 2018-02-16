@@ -2,6 +2,7 @@ package gcloud.scala
 
 import com.google.api.gax.grpc.InstantiatingGrpcChannelProvider
 import com.google.cloud.pubsub.{v1 => gcv1}
+import com.google.cloud.pubsub.v1.stub
 import com.google.protobuf.{ByteString, Empty, FieldMask}
 import com.google.pubsub.v1
 import com.google.pubsub.v1._
@@ -170,4 +171,8 @@ package object pubsub {
 
   implicit def finiteDurationToBpDuration(duration: FiniteDuration): Duration =
     Duration.ofNanos(duration.toNanos)
+
+  implicit def subscriberStubSettingsToInstance(
+      builder: stub.SubscriberStubSettings.Builder
+  ): stub.SubscriberStubSettings = builder.build()
 }
