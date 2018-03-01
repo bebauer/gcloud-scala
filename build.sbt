@@ -10,12 +10,29 @@ lazy val `gcloud-scala` = (project in file("."))
 
 lazy val `gcloud-scala-pubsub` =
   (project in file("pubsub"))
-    .settings(libraryDependencies ++= Dependencies.pubSub)
+    .settings(
+      libraryDependencies ++= Dependencies.pubSub,
+      sourceGenerators in Compile += Def.taskDyn {
+        val outFile = sourceManaged.value / "main" / "Generated.scala"
+        Def.task {
+          (run in `gcloud-scala-codegen` in Compile)
+            .toTask(" " + outFile.getAbsolutePath)
+            .value
+          Seq(outFile)
+        }
+      }.taskValue
+    )
 
 lazy val `gcloud-scala-pubsub-testkit` =
   (project in file("pubsub-testkit"))
-    .settings(libraryDependencies ++= Dependencies.pubSubTestKit)
+    .settings(
+      libraryDependencies ++= Dependencies.pubSubTestKit
+    )
     .dependsOn(`gcloud-scala-pubsub`)
+
+lazy val `gcloud-scala-codegen` =
+  (project in file("codegen"))
+    .settings(libraryDependencies ++= Dependencies.codeGen, publish := {}, publishLocal := {})
 
 lazy val commonSettings = Seq(
   organization := "gcloud-scala",

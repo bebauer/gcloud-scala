@@ -1,8 +1,9 @@
 package gcloud.scala
 
 import com.google.api.gax.grpc.InstantiatingGrpcChannelProvider
-import com.google.cloud.pubsub.{v1 => gcv1}
+import com.google.api.gax.rpc.UnaryCallable
 import com.google.cloud.pubsub.v1.stub
+import com.google.cloud.pubsub.{v1 => gcv1}
 import com.google.protobuf.{ByteString, Empty, FieldMask}
 import com.google.pubsub.v1
 import com.google.pubsub.v1._
@@ -14,7 +15,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 import scala.language.implicitConversions
 
+
 package object pubsub {
+
+  import FutureConversions._
 
   /**
     * Implicitly converts a string to a [[ProjectName]] by calling [[ProjectName.apply()]].
@@ -175,4 +179,12 @@ package object pubsub {
   implicit def subscriberStubSettingsToInstance(
       builder: stub.SubscriberStubSettings.Builder
   ): stub.SubscriberStubSettings = builder.build()
+
+  implicit def publisherStubSettingsToInstance(
+      builder: stub.PublisherStubSettings.Builder
+  ): stub.PublisherStubSettings = builder.build()
+
+  implicit def unaryCallableConversion[REQUEST, RESPONSE](
+      callable: UnaryCallable[REQUEST, RESPONSE]
+  ): REQUEST => Future[RESPONSE] = request => callable.futureCall(request).asScala
 }
