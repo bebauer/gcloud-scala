@@ -8,6 +8,7 @@ import com.google.pubsub.v1
 import com.google.pubsub.v1.PubsubMessage
 import gcloud.scala.pubsub.FutureConversions._
 import gcloud.scala.pubsub._
+import gcloud.scala.pubsub.syntax._
 import gcloud.scala.pubsub.testkit.Lazy._
 import org.scalatest.{BeforeAndAfterAll, Suite}
 
@@ -29,14 +30,16 @@ trait PubSubTestKit extends BeforeAndAfterAll {
   private val subscriptionAdminClientLazy
     : Lazy[com.google.cloud.pubsub.v1.SubscriptionAdminClient] = lazily {
     SubscriptionAdminClient(
-      SubscriptionAdminSettings(pubSubUrl).setCredentialsProvider(new NoCredentialsProvider())
+      ((pubSubUrl: PubSubUrl): SubscriptionAdminClient.Settings)
+        .copy(credentialsProvider = new NoCredentialsProvider())
     )
   }
   def subscriptionAdminClient = subscriptionAdminClientLazy()
 
   private val topicAdminClientLazy: Lazy[com.google.cloud.pubsub.v1.TopicAdminClient] = lazily {
     TopicAdminClient(
-      TopicAdminSettings(pubSubUrl).setCredentialsProvider(new NoCredentialsProvider())
+      ((pubSubUrl: PubSubUrl): TopicAdminClient.Settings)
+        .copy(credentialsProvider = new NoCredentialsProvider())
     )
   }
   def topicAdminClient = topicAdminClientLazy()

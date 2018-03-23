@@ -1,12 +1,12 @@
 package gcloud.scala.pubsub.testkit
 
-import gcloud.scala.pubsub.PublisherStub.PublishRequest
 import gcloud.scala.pubsub._
+import gcloud.scala.pubsub.syntax._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 
-import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContextExecutor}
 
 class PublisherStubSpec
     extends WordSpec
@@ -23,11 +23,16 @@ class PublisherStubSpec
       val settings      = newTestSetup()
       val (_, topic, _) = settings
 
-      val stub = stubs.PublisherStub(pubSubUrl)
+      val stub = PublisherStub(pubSubUrl)
 
       try {
-        Await.ready(stub.publishCallable()(PublishRequest(topic, "Test1")), 5.seconds)
-        Await.ready(stub.publishCallable()(PublishRequest(topic, PubSubMessage("Test2"))),
+        Await.ready(
+          stub.publishAsync(PublishRequest(topic = topic.fullName, messages = Seq("Test1"))),
+          5.seconds
+        )
+        Await.ready(stub.publishAsync(
+                      PublishRequest(topic = topic.fullName, messages = Seq(PubSubMessage("Test2")))
+                    ),
                     5.seconds)
 
         pullMessages(settings, 2).map(_.getData.toStringUtf8) should contain only ("Test1", "Test2")

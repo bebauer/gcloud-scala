@@ -4,7 +4,7 @@ import com.google.api.gax.grpc.InstantiatingGrpcChannelProvider
 import com.google.api.gax.rpc.UnaryCallable
 import com.google.cloud.pubsub.v1.stub
 import com.google.cloud.pubsub.{v1 => gcv1}
-import com.google.protobuf.{ByteString, Empty, FieldMask}
+import com.google.protobuf.ByteString
 import com.google.pubsub.v1
 import com.google.pubsub.v1._
 import gcloud.scala.pubsub.PubSubMessage.MessageDataEncoder
@@ -14,7 +14,6 @@ import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 import scala.language.implicitConversions
-
 
 package object pubsub {
 
@@ -61,58 +60,6 @@ package object pubsub {
   implicit def topicAdminSettingsBuilderToInstance(
       builder: gcv1.TopicAdminSettings.Builder
   ): gcv1.TopicAdminSettings = builder.build()
-
-  implicit class SubscriptionAdminClientExtensions(val client: gcv1.SubscriptionAdminClient)
-      extends AnyVal {
-    def getSubscriptionAsync(subscriptionName: SubscriptionName): Future[Option[Subscription]] =
-      SubscriptionAdminClient.Logic.getSubscriptionAsync(client, subscriptionName)
-
-    def createSubscriptionAsync(subscription: Subscription): Future[Subscription] =
-      SubscriptionAdminClient.Logic.createSubscriptionAsync(client, subscription)
-
-    def updateSubscriptionAsync(subscription: Subscription,
-                                updateMask: Option[FieldMask] = None): Future[Subscription] =
-      SubscriptionAdminClient.Logic.updateSubscriptionAsync(client, subscription, updateMask)
-
-    def deleteSubscriptionAsync(subscriptionName: SubscriptionName): Future[Empty] =
-      SubscriptionAdminClient.Logic.deleteSubscriptionAsync(client, subscriptionName)
-
-    def listSubscriptionsAsync(
-        projectName: ProjectName,
-        pageSize: Option[Int] = None,
-        pageToken: Option[String] = None
-    ): Future[ListSubscriptionsResponse] =
-      SubscriptionAdminClient.Logic.listSubscriptionsAsync(client, projectName, pageSize, pageToken)
-
-    def modifyPushConfigAsync(subscriptionName: SubscriptionName,
-                              pushConfig: PushConfig): Future[Empty] =
-      SubscriptionAdminClient.Logic.modifyPushConfigAsync(client, subscriptionName, pushConfig)
-  }
-
-  implicit class TopicAdminClientExtensions(val client: gcv1.TopicAdminClient) extends AnyVal {
-    def listTopicsAsync(
-        projectName: ProjectName,
-        pageSize: Option[Int] = None,
-        pageToken: Option[String] = None
-    ): Future[ListTopicsResponse] =
-      TopicAdminClient.Logic.listTopicsAsync(client, projectName, pageSize, pageToken)
-
-    def createTopicAsync(topic: Topic): Future[Topic] =
-      TopicAdminClient.Logic.createTopicAsync(client, topic)
-
-    def getTopicAsync(topicName: TopicName): Future[Option[Topic]] =
-      TopicAdminClient.Logic.getTopicAsync(client, topicName)
-
-    def deleteTopicAsync(topicName: TopicName): Future[Empty] =
-      TopicAdminClient.Logic.deleteTopicAsync(client, topicName)
-
-    def listTopicSubscriptionsAsync(
-        topicName: TopicName,
-        pageSize: Option[Int] = None,
-        pageToken: Option[String] = None
-    ): Future[ListTopicSubscriptionsResponse] =
-      TopicAdminClient.Logic.listTopicSubscriptionsAsync(client, topicName, pageSize, pageToken)
-  }
 
   implicit class ListTopicResponseExtensions(val listTopicsResponse: ListTopicsResponse)
       extends AnyVal {
