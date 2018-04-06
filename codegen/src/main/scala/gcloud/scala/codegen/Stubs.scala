@@ -11,19 +11,24 @@ import treehuggerDSL._
 
 object Stubs {
 
-  def generateStubExtensions(stubClass: Class[_]): forest.ClassDef = {
+  def generateStubExtensions(stubClass: Class[_],
+                             flattenExcluded: Seq[Class[_]] = Seq()): forest.ClassDef = {
     val StubEnhanced = RootClass.newClass(s"${stubClass.getSimpleName}Extensions")
     val stub         = "stub"
 
     CLASSDEF(StubEnhanced) withParams VAL(stub, stubClass.getName).tree withFlags Flags.IMPLICIT withParents AnyValClass := BLOCK(
       stubClass.getMethods.collect {
         case method if method.getReturnType == classOf[UnaryCallable[_, _]] =>
+          val requestObject = method.getGenericReturnType
+            .asInstanceOf[ParameterizedType]
+            .getActualTypeArguments()(0)
+            .asInstanceOf[Class[_]]
+            .getSimpleName
           val requestType =
             method.getGenericReturnType
               .asInstanceOf[ParameterizedType]
               .getActualTypeArguments()(0)
               .getTypeName
-              .asScalaClass
           val responseType =
             method.getGenericReturnType
               .asInstanceOf[ParameterizedType]
@@ -31,11 +36,31 @@ object Stubs {
               .getTypeName
               .asScalaClass
 
-          DEF(method.getName.replace("Callable", "Async"), s"Future[$responseType]") withParams PARAM(
-            "request",
-            requestType
-          ).tree := REF(stub) DOT method.getName DOT "futureCall" APPLY REF("request") DOT "asScala"
-      }
+          val builderClass = Class.forName(s"$requestType$$Builder")
+
+          val defs = Seq(
+            DEF(method.getName.replace("Callable", "Async"), s"Future[$responseType]") withParams PARAM(
+              "request",
+              requestType.asScalaClass
+            ).tree := REF(stub) DOT method.getName DOT "futureCall" APPLY REF("request") DOT "asScala"
+          )
+
+          flattenExcluded.find(_ == Class.forName(requestType)) match {
+            case None =>
+              defs :+ (DEF(method.getName.replace("Callable", "Async"), s"Future[$responseType]") withParams paramsFromBuilder(
+                builderClass,
+                PubSub.RequestIgnores,
+                s"$requestObject.defaultBuilder"
+              ) := REF(
+                stub
+              ) DOT method.getName DOT "futureCall" APPLY (REF(requestObject) APPLY builderFields(
+                builderClass,
+                PubSub.RequestIgnores
+              ).map(bf => REF(bf.name) := REF(bf.name))) DOT "asScala")
+            case Some(_) =>
+              defs
+          }
+      }.flatten
     )
   }
 

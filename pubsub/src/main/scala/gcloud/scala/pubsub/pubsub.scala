@@ -28,12 +28,28 @@ package object pubsub {
   implicit def projectFromString(name: String): ProjectName = ProjectName(name)
 
   /**
+    * Implicitly convert a [[ProjectName]] to [[String]].
+    *
+    * @param projectName the project name
+    * @return the name of the project
+    */
+  implicit def projectToString(projectName: ProjectName): String = projectName.toString
+
+  /**
     * Implicitly converts a string to a [[TopicName]] by calling [[TopicName.apply()]].
     *
     * @param fullName the full name
     * @return the [[TopicName]]
     */
   implicit def topicFromString(fullName: String): TopicName = TopicName(fullName)
+
+  /**
+    * Implicitly convert a [[TopicName]] to [[String]].
+    *
+    * @param topicName the topic name
+    * @return the full name of the topic
+    */
+  implicit def topicToString(topicName: TopicName): String = topicName.fullName
 
   implicit class TopicNameExtensions(val topicName: TopicName) extends AnyVal {
     def fullName: String = topicName.toString
@@ -47,6 +63,15 @@ package object pubsub {
     */
   implicit def subscriptionFromString(fullName: String): SubscriptionName =
     SubscriptionName(fullName)
+
+  /**
+    * Implicitly convert a [[SubscriptionName]] to [[String]].
+    *
+    * @param subscriptionName the subscription name
+    * @return the full name of the subscription
+    */
+  implicit def subscriptionToString(subscriptionName: SubscriptionName): String =
+    subscriptionName.fullName
 
   implicit class SubscriptionNameExtensions(val subscriptionName: v1.SubscriptionName)
       extends AnyVal {

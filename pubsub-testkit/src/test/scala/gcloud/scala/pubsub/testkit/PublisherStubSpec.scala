@@ -27,12 +27,10 @@ class PublisherStubSpec
 
       try {
         Await.ready(
-          stub.publishAsync(PublishRequest(topic = topic.fullName, messages = Seq("Test1"))),
+          stub.publishAsync(topic = topic, messages = Seq("Test1")),
           5.seconds
         )
-        Await.ready(stub.publishAsync(
-                      PublishRequest(topic = topic.fullName, messages = Seq(PubSubMessage("Test2")))
-                    ),
+        Await.ready(stub.publishAsync(topic = topic, messages = Seq(PubSubMessage("Test2"))),
                     5.seconds)
 
         pullMessages(settings, 2).map(_.getData.toStringUtf8) should contain only ("Test1", "Test2")

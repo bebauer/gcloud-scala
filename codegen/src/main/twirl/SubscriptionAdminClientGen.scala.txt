@@ -1,0 +1,7 @@
+def getSubscriptionOptionAsync(subscription: String): Future[Option[com.google.pubsub.v1.Subscription]] = {
+    implicit val ec = scala.concurrent.ExecutionContext.fromExecutor(client.getSettings.getExecutorProvider.getExecutor)
+
+    client.getSubscriptionAsync(subscription = subscription).map(Some(_)).recover {
+        case _: com.google.api.gax.rpc.NotFoundException => None
+    }
+}

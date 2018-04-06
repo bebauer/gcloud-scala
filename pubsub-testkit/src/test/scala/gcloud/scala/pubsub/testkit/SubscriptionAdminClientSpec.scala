@@ -1,13 +1,12 @@
 package gcloud.scala.pubsub.testkit
 
-import com.google.pubsub.v1.PushConfig
-import gcloud.scala.pubsub.{SubscriptionName, _}
+import gcloud.scala.pubsub._
+import gcloud.scala.pubsub.syntax._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Matchers, OptionValues, WordSpec}
 
 import scala.concurrent.ExecutionContextExecutor
-import scala.concurrent.duration._
 
 class SubscriptionAdminClientSpec
     extends WordSpec
@@ -40,7 +39,7 @@ class SubscriptionAdminClientSpec
       val (_, _, subscription) = newTestSetup()
 
       subscriptionAdminClient
-        .getSubscriptionAsync(subscription)
+        .getSubscriptionOptionAsync(subscription)
         .futureValue
         .value
         .getName shouldBe subscription.fullName
@@ -50,7 +49,7 @@ class SubscriptionAdminClientSpec
       val (project, _, _) = newTestSetup()
 
       subscriptionAdminClient
-        .getSubscriptionAsync(SubscriptionName(project, "doesnotexist"))
+        .getSubscriptionOptionAsync(SubscriptionName(project, "doesnotexist"))
         .futureValue shouldBe None
     }
 
@@ -58,7 +57,7 @@ class SubscriptionAdminClientSpec
       val (_, _, subscription) = newTestSetup()
 
       whenReady(subscriptionAdminClient.deleteSubscriptionAsync(subscription)) { _ =>
-        subscriptionAdminClient.getSubscriptionAsync(subscription).futureValue shouldBe None
+        subscriptionAdminClient.getSubscriptionOptionAsync(subscription).futureValue shouldBe None
       }
     }
 
@@ -75,7 +74,6 @@ class SubscriptionAdminClientSpec
         subscriptionAdminClient
           .getSubscriptionAsync(subscription)
           .futureValue
-          .value
           .getAckDeadlineSeconds shouldBe 60
       }
     }
@@ -84,20 +82,9 @@ class SubscriptionAdminClientSpec
       val (project, _, _) = newTestSetup()
 
       subscriptionAdminClient
-        .listSubscriptionsAsync(project)
+        .listSubscriptionsAsync(project = project)
         .futureValue
         .subscriptions should have size 1
-    }
-
-    "modify push config" in {
-      val (_, _, subscription) = newTestSetup()
-
-      subscriptionAdminClient
-        .modifyPushConfigAsync(
-          subscription,
-          PushConfig.newBuilder().setPushEndpoint("http://localhost:9999").build()
-        )
-        .isReadyWithin(5.seconds)
     }
   }
 }

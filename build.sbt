@@ -32,6 +32,7 @@ lazy val `gcloud-scala-pubsub-testkit` =
 
 lazy val `gcloud-scala-codegen` =
   (project in file("codegen"))
+    .enablePlugins(SbtTwirl)
     .settings(libraryDependencies ++= Dependencies.codeGen, publish := {}, publishLocal := {})
 
 lazy val commonSettings = Seq(
