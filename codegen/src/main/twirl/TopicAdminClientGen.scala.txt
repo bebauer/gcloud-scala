@@ -1,0 +1,7 @@
+def getTopicOptionAsync(topic: String): Future[Option[com.google.pubsub.v1.Topic]] = {
+    implicit val ec = scala.concurrent.ExecutionContext.fromExecutor(client.getSettings.getExecutorProvider.getExecutor)
+
+    client.getTopicAsync(topic = topic).map(Some(_)).recover {
+        case _: com.google.api.gax.rpc.NotFoundException => None
+    }
+}

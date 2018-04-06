@@ -1,6 +1,7 @@
 package gcloud.scala.pubsub.testkit
 
-import gcloud.scala.pubsub.{TopicName, _}
+import gcloud.scala.pubsub._
+import gcloud.scala.pubsub.syntax._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Matchers, OptionValues, WordSpec}
@@ -26,33 +27,33 @@ class TopicAdminClientSpec
     "list topics" in {
       val (project, _, _) = newTestSetup()
 
-      topicAdminClient.listTopicsAsync(project).futureValue.topics should have size 1
+      topicAdminClient.listTopicsAsync(project = project).futureValue.topics should have size 1
     }
 
     "get existing topic" in {
       val (_, topic, _) = newTestSetup()
 
-      topicAdminClient.getTopicAsync(topic).futureValue.value.getName shouldBe topic.fullName
+      topicAdminClient.getTopicOptionAsync(topic).futureValue.value.getName shouldBe topic.fullName
     }
 
     "get non existing topic" in {
       val (project, _, _) = newTestSetup()
 
-      topicAdminClient.getTopicAsync(TopicName(project, "doesnotexit")).futureValue shouldBe None
+      topicAdminClient.getTopicOptionAsync(TopicName(project, "doesnotexit")).futureValue shouldBe None
     }
 
     "delete topic" in {
       val (_, topic, _) = newTestSetup()
 
       whenReady(topicAdminClient.deleteTopicAsync(topic)) { _ =>
-        topicAdminClient.getTopicAsync(topic).futureValue shouldBe None
+        topicAdminClient.getTopicOptionAsync(topic).futureValue shouldBe None
       }
     }
 
     "list topic subscriptions" in {
       val (_, topic, subscription) = newTestSetup()
 
-      topicAdminClient.listTopicSubscriptionsAsync(topic).futureValue.subscriptions should contain(
+      topicAdminClient.listTopicSubscriptionsAsync(topic = topic).futureValue.subscriptions should contain(
         subscription
       )
     }

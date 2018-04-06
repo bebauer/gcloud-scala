@@ -1,8 +1,10 @@
 package gcloud.scala
 
 import com.google.api.gax.grpc.InstantiatingGrpcChannelProvider
+import com.google.api.gax.rpc.UnaryCallable
+import com.google.cloud.pubsub.v1.stub
 import com.google.cloud.pubsub.{v1 => gcv1}
-import com.google.protobuf.{ByteString, Empty, FieldMask}
+import com.google.protobuf.ByteString
 import com.google.pubsub.v1
 import com.google.pubsub.v1._
 import gcloud.scala.pubsub.PubSubMessage.MessageDataEncoder
@@ -15,6 +17,8 @@ import scala.language.implicitConversions
 
 package object pubsub {
 
+  import FutureConversions._
+
   /**
     * Implicitly converts a string to a [[ProjectName]] by calling [[ProjectName.apply()]].
     *
@@ -24,12 +28,28 @@ package object pubsub {
   implicit def projectFromString(name: String): ProjectName = ProjectName(name)
 
   /**
+    * Implicitly convert a [[ProjectName]] to [[String]].
+    *
+    * @param projectName the project name
+    * @return the name of the project
+    */
+  implicit def projectToString(projectName: ProjectName): String = projectName.toString
+
+  /**
     * Implicitly converts a string to a [[TopicName]] by calling [[TopicName.apply()]].
     *
     * @param fullName the full name
     * @return the [[TopicName]]
     */
   implicit def topicFromString(fullName: String): TopicName = TopicName(fullName)
+
+  /**
+    * Implicitly convert a [[TopicName]] to [[String]].
+    *
+    * @param topicName the topic name
+    * @return the full name of the topic
+    */
+  implicit def topicToString(topicName: TopicName): String = topicName.fullName
 
   implicit class TopicNameExtensions(val topicName: TopicName) extends AnyVal {
     def fullName: String = topicName.toString
@@ -44,6 +64,15 @@ package object pubsub {
   implicit def subscriptionFromString(fullName: String): SubscriptionName =
     SubscriptionName(fullName)
 
+  /**
+    * Implicitly convert a [[SubscriptionName]] to [[String]].
+    *
+    * @param subscriptionName the subscription name
+    * @return the full name of the subscription
+    */
+  implicit def subscriptionToString(subscriptionName: SubscriptionName): String =
+    subscriptionName.fullName
+
   implicit class SubscriptionNameExtensions(val subscriptionName: v1.SubscriptionName)
       extends AnyVal {
     def fullName: String = subscriptionName.toString
@@ -56,58 +85,6 @@ package object pubsub {
   implicit def topicAdminSettingsBuilderToInstance(
       builder: gcv1.TopicAdminSettings.Builder
   ): gcv1.TopicAdminSettings = builder.build()
-
-  implicit class SubscriptionAdminClientExtensions(val client: gcv1.SubscriptionAdminClient)
-      extends AnyVal {
-    def getSubscriptionAsync(subscriptionName: SubscriptionName): Future[Option[Subscription]] =
-      SubscriptionAdminClient.Logic.getSubscriptionAsync(client, subscriptionName)
-
-    def createSubscriptionAsync(subscription: Subscription): Future[Subscription] =
-      SubscriptionAdminClient.Logic.createSubscriptionAsync(client, subscription)
-
-    def updateSubscriptionAsync(subscription: Subscription,
-                                updateMask: Option[FieldMask] = None): Future[Subscription] =
-      SubscriptionAdminClient.Logic.updateSubscriptionAsync(client, subscription, updateMask)
-
-    def deleteSubscriptionAsync(subscriptionName: SubscriptionName): Future[Empty] =
-      SubscriptionAdminClient.Logic.deleteSubscriptionAsync(client, subscriptionName)
-
-    def listSubscriptionsAsync(
-        projectName: ProjectName,
-        pageSize: Option[Int] = None,
-        pageToken: Option[String] = None
-    ): Future[ListSubscriptionsResponse] =
-      SubscriptionAdminClient.Logic.listSubscriptionsAsync(client, projectName, pageSize, pageToken)
-
-    def modifyPushConfigAsync(subscriptionName: SubscriptionName,
-                              pushConfig: PushConfig): Future[Empty] =
-      SubscriptionAdminClient.Logic.modifyPushConfigAsync(client, subscriptionName, pushConfig)
-  }
-
-  implicit class TopicAdminClientExtensions(val client: gcv1.TopicAdminClient) extends AnyVal {
-    def listTopicsAsync(
-        projectName: ProjectName,
-        pageSize: Option[Int] = None,
-        pageToken: Option[String] = None
-    ): Future[ListTopicsResponse] =
-      TopicAdminClient.Logic.listTopicsAsync(client, projectName, pageSize, pageToken)
-
-    def createTopicAsync(topic: Topic): Future[Topic] =
-      TopicAdminClient.Logic.createTopicAsync(client, topic)
-
-    def getTopicAsync(topicName: TopicName): Future[Option[Topic]] =
-      TopicAdminClient.Logic.getTopicAsync(client, topicName)
-
-    def deleteTopicAsync(topicName: TopicName): Future[Empty] =
-      TopicAdminClient.Logic.deleteTopicAsync(client, topicName)
-
-    def listTopicSubscriptionsAsync(
-        topicName: TopicName,
-        pageSize: Option[Int] = None,
-        pageToken: Option[String] = None
-    ): Future[ListTopicSubscriptionsResponse] =
-      TopicAdminClient.Logic.listTopicSubscriptionsAsync(client, topicName, pageSize, pageToken)
-  }
 
   implicit class ListTopicResponseExtensions(val listTopicsResponse: ListTopicsResponse)
       extends AnyVal {
@@ -170,4 +147,16 @@ package object pubsub {
 
   implicit def finiteDurationToBpDuration(duration: FiniteDuration): Duration =
     Duration.ofNanos(duration.toNanos)
+
+  implicit def subscriberStubSettingsToInstance(
+      builder: stub.SubscriberStubSettings.Builder
+  ): stub.SubscriberStubSettings = builder.build()
+
+  implicit def publisherStubSettingsToInstance(
+      builder: stub.PublisherStubSettings.Builder
+  ): stub.PublisherStubSettings = builder.build()
+
+  implicit def unaryCallableConversion[REQUEST, RESPONSE](
+      callable: UnaryCallable[REQUEST, RESPONSE]
+  ): REQUEST => Future[RESPONSE] = request => callable.futureCall(request).asScala
 }
