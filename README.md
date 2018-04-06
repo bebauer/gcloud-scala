@@ -12,6 +12,8 @@ gcloud scala
 
 # Usage
 
+## Add Dependencies
+
 ```
 // Add resolver for https://dl.bintray.com/bebauer/maven/
 resolvers += Resolver.bintrayRepo("bebauer", "maven")
@@ -21,6 +23,13 @@ resolvers += Resolver.bintrayRepo("bebauer", "maven")
 // Pub/Sub
 "gcloud-scala" %% "gcloud-scala-pubsub" % "0.2.0"
 "gcloud-scala" %% "gcloud-scala-pubsub-testkit" % "0.2.0" % Test
+```
+
+## Imports
+
+```
+import gcloud.scala.pubsub._
+import gcloud.scala.pubsub.syntax._
 ```
 
 # License
