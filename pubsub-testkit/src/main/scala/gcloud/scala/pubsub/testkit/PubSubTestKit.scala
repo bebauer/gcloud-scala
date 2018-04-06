@@ -1,17 +1,16 @@
 package gcloud.scala.pubsub.testkit
 
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 import com.google.api.gax.core.NoCredentialsProvider
 import com.google.pubsub.v1
 import com.google.pubsub.v1.PubsubMessage
-import gcloud.scala.pubsub.FutureConversions._
 import gcloud.scala.pubsub._
 import gcloud.scala.pubsub.syntax._
 import gcloud.scala.pubsub.testkit.Lazy._
 import org.scalatest.{BeforeAndAfterAll, Suite}
 
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.language.implicitConversions
@@ -72,50 +71,54 @@ trait PubSubTestKit extends BeforeAndAfterAll {
                          messages: T*)(implicit conv: T => PubsubMessage): Seq[String] = {
     val (_, topic, _) = settings
 
-    val publisher = Publisher
-      .Builder(topic, pubSubUrl)
-      .setCredentialsProvider(new NoCredentialsProvider())
-      .build()
+    val publisher = PublisherStub(
+      ((pubSubUrl: PubSubUrl): PublisherStub.Settings)
+        .copy(credentialsProvider = new NoCredentialsProvider())
+    )
 
     try {
-      messages
-        .map(conv)
-        .map(publisher.publish)
-        .map(_.asScala)
-        .map(Await.result(_, publishTimeout))
+      Await
+        .result(publisher.publishAsync(topic = topic, messages = messages.map(conv)),
+                publishTimeout)
+        .getMessageIdsList
+        .asScala
     } finally {
-      publisher.shutdown()
+      publisher.close()
     }
   }
 
   def pullMessages(settings: PubSubTestSettings, amount: Int = Int.MaxValue): Seq[PubsubMessage] = {
     val (_, _, subscription) = settings
 
-    val messages = collection.mutable.ArrayBuffer[PubsubMessage]()
+    val subscriber = SubscriberStub(
+      ((pubSubUrl: PubSubUrl): SubscriberStub.Settings)
+        .copy(credentialsProvider = new NoCredentialsProvider())
+    )
 
-    val subscriber =
-      Subscriber(subscription, pubSubUrl, new NoCredentialsProvider()) { (message, consumer) =>
-        messages += message
-        consumer.ack()
+    try {
+      var lastUpdate = System.nanoTime()
+      var cancel     = false
+
+      val messages = collection.mutable.ArrayBuffer[PubsubMessage]()
+
+      while (!cancel && messages.size < amount) {
+        if (System.nanoTime() - lastUpdate > 1.second.toNanos) {
+          cancel = true
+        } else {
+          messages ++= Await
+            .result(subscriber.pullAsync(maxMessages = amount,
+                                         returnImmediately = true,
+                                         subscription = subscription),
+                    10.seconds)
+            .receivedMessages
+            .map(_.getMessage)
+          lastUpdate = System.nanoTime()
+        }
       }
 
-    subscriber.startAsync().awaitRunning(10, TimeUnit.SECONDS)
-
-    var lastMessages = 0
-    var lastUpdate   = System.nanoTime()
-    var cancel       = false
-
-    while (!cancel && messages.size < amount) {
-      if (lastMessages != messages.size) {
-        lastMessages = messages.size
-        lastUpdate = System.nanoTime()
-      } else if (System.nanoTime() - lastUpdate > 1.second.toNanos) {
-        cancel = true
-      }
+      Seq(messages: _*).take(amount)
+    } finally {
+      subscriber.close()
     }
-
-    subscriber.stopAsync().awaitTerminated(10, TimeUnit.SECONDS)
-
-    Seq(messages: _*).take(amount)
   }
 }
