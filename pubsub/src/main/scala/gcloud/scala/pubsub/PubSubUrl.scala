@@ -19,6 +19,8 @@ object PubSubUrl {
 
     PubSubUrl(url.getHost, url.getPort, tlsEnabled)
   }
+
+  def apply(url: String): PubSubUrl = fromString(url)
 }
 
 case class PubSubUrl(host: String, port: Int, tlsEnabled: Boolean) {

@@ -72,12 +72,15 @@ object Stubs {
       (DEF("apply", stubClass.getName) withParams PARAM("url", "PubSubUrl").tree := REF(
         stubClass.getSimpleName
       ) APPLY (REF("url") withType "Settings")) +:
-      (DEF("apply", stubClass.getName) withParams PARAM(
+      (DEF("apply", stubClass.getName) withParams (PARAM(
         "settings",
         settingsClass.getName.asScalaClass
-      ).tree := REF(
+      ) := (REF("Settings") APPLY ())) := REF(
         "settings"
       ) DOT "createStub" APPLY ()) +:
+      (OBJECTDEF("Settings") := BLOCK(
+        DEF("apply", "Settings") withParams PARAM("url", "PubSubUrl").tree := REF("url")
+      )) +:
       generateBuilder(settingsClass, settingsBuilderClass, ignoredBuilderMethods) :+
       (DEF(
         "pubsubUrlToSettings",

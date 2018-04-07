@@ -73,10 +73,15 @@ object Clients {
       (DEF("apply", clientClass.getName) withParams PARAM("url", "PubSubUrl").tree := REF(
         clientClass.getSimpleName
       ) APPLY (REF("url") withType "Settings")) +:
-      (DEF("apply", clientClass.getName) withParams PARAM(
+      (DEF("apply", clientClass.getName) withParams (PARAM(
         "settings",
         settingsClass.getName.asScalaClass
-      ).tree := REF(clientClass.getName) DOT "create" APPLY REF("settings")) +:
+      ) := (REF("Settings") APPLY ())) := REF(clientClass.getName) DOT "create" APPLY REF(
+        "settings"
+      )) +:
+      (OBJECTDEF("Settings") := BLOCK(
+        DEF("apply", "Settings") withParams PARAM("url", "PubSubUrl").tree := REF("url")
+      )) +:
       generateBuilder(settingsClass, settingsBuilderClass, ignoredBuilderMethods) :+
       (DEF(
         "pubsubUrlToSettings",

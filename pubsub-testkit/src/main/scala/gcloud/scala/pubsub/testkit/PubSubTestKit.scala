@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.google.api.gax.core.NoCredentialsProvider
 import com.google.pubsub.v1
-import com.google.pubsub.v1.PubsubMessage
+import com.google.pubsub.v1.{PubsubMessage, ReceivedMessage}
 import gcloud.scala.pubsub._
 import gcloud.scala.pubsub.syntax._
 import gcloud.scala.pubsub.testkit.Lazy._
@@ -29,7 +29,8 @@ trait PubSubTestKit extends BeforeAndAfterAll {
   private val subscriptionAdminClientLazy
     : Lazy[com.google.cloud.pubsub.v1.SubscriptionAdminClient] = lazily {
     SubscriptionAdminClient(
-      ((pubSubUrl: PubSubUrl): SubscriptionAdminClient.Settings)
+      SubscriptionAdminClient
+        .Settings(pubSubUrl)
         .copy(credentialsProvider = new NoCredentialsProvider())
     )
   }
@@ -37,7 +38,8 @@ trait PubSubTestKit extends BeforeAndAfterAll {
 
   private val topicAdminClientLazy: Lazy[com.google.cloud.pubsub.v1.TopicAdminClient] = lazily {
     TopicAdminClient(
-      ((pubSubUrl: PubSubUrl): TopicAdminClient.Settings)
+      TopicAdminClient
+        .Settings(pubSubUrl)
         .copy(credentialsProvider = new NoCredentialsProvider())
     )
   }
@@ -72,7 +74,8 @@ trait PubSubTestKit extends BeforeAndAfterAll {
     val (_, topic, _) = settings
 
     val publisher = PublisherStub(
-      ((pubSubUrl: PubSubUrl): PublisherStub.Settings)
+      PublisherStub
+        .Settings(pubSubUrl)
         .copy(credentialsProvider = new NoCredentialsProvider())
     )
 
@@ -87,11 +90,16 @@ trait PubSubTestKit extends BeforeAndAfterAll {
     }
   }
 
-  def pullMessages(settings: PubSubTestSettings, amount: Int = Int.MaxValue): Seq[PubsubMessage] = {
+  def pullMessages(settings: PubSubTestSettings, amount: Int = Int.MaxValue): Seq[PubsubMessage] =
+    pullReceivedMessages(settings, amount).map(_.getMessage)
+
+  def pullReceivedMessages(settings: PubSubTestSettings,
+                           amount: Int = Int.MaxValue): Seq[ReceivedMessage] = {
     val (_, _, subscription) = settings
 
     val subscriber = SubscriberStub(
-      ((pubSubUrl: PubSubUrl): SubscriberStub.Settings)
+      SubscriberStub
+        .Settings(pubSubUrl)
         .copy(credentialsProvider = new NoCredentialsProvider())
     )
 
@@ -99,7 +107,7 @@ trait PubSubTestKit extends BeforeAndAfterAll {
       var lastUpdate = System.nanoTime()
       var cancel     = false
 
-      val messages = collection.mutable.ArrayBuffer[PubsubMessage]()
+      val messages = collection.mutable.ArrayBuffer[ReceivedMessage]()
 
       while (!cancel && messages.size < amount) {
         if (System.nanoTime() - lastUpdate > 1.second.toNanos) {
@@ -111,7 +119,6 @@ trait PubSubTestKit extends BeforeAndAfterAll {
                                          subscription = subscription),
                     10.seconds)
             .receivedMessages
-            .map(_.getMessage)
           lastUpdate = System.nanoTime()
         }
       }
