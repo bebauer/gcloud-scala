@@ -31,7 +31,7 @@ class SubscriberStubSpec
         stub.pullAsync(
           PullRequest(subscription = subscription, maxMessages = 10, returnImmediately = true)
         ),
-        5.seconds
+        20.seconds
       )
 
       response.receivedMessages.map(_.getMessage.getData.toStringUtf8) should contain only ("1", "2", "3")
