@@ -5,7 +5,7 @@ import com.google.pubsub.v1
 
 import scala.collection.JavaConverters._
 
-object PubSubMessage {
+object PubsubMessage {
   type MessageDataEncoder[T] = T => ByteString
 
   def apply[T](data: T, attributes: Map[String, String] = Map())(

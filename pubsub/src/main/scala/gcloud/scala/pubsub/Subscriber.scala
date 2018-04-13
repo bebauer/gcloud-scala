@@ -9,12 +9,11 @@ import com.google.cloud.pubsub.v1.{
   Subscriber => GCloudSubscriber
 }
 import com.google.pubsub.v1
-import com.google.pubsub.v1.PubsubMessage
 
 object Subscriber {
   private[pubsub] final val MaxInboundMessageSize = 20 * 1024 * 1024 // 20MB API maximum message size.
 
-  type MessageReceiverType = (PubsubMessage, AckReplyConsumer) => Unit
+  type MessageReceiverType = (v1.PubsubMessage, AckReplyConsumer) => Unit
 
   def apply(
       subscriptionName: v1.ProjectSubscriptionName
@@ -59,7 +58,7 @@ object Subscriber {
   }
 
   private class MessageReceiverWrapper(receiver: MessageReceiverType) extends MessageReceiver {
-    override def receiveMessage(message: PubsubMessage, consumer: AckReplyConsumer): Unit =
+    override def receiveMessage(message: v1.PubsubMessage, consumer: AckReplyConsumer): Unit =
       receiver(message, consumer)
   }
 }

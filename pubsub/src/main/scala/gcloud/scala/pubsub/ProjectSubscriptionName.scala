@@ -2,6 +2,9 @@ package gcloud.scala.pubsub
 
 import com.google.pubsub.v1
 
+/**
+  * Companion object for [[v1.ProjectSubscriptionName]].
+  */
 object ProjectSubscriptionName {
   private val SubscriptionNamePattern = "projects/(.+)/subscriptions/(.+)".r
 

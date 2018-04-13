@@ -7,10 +7,9 @@ import com.google.cloud.pubsub.{v1 => gcv1}
 import com.google.protobuf.ByteString
 import com.google.pubsub.v1
 import com.google.pubsub.v1._
-import gcloud.scala.pubsub.PubSubMessage.MessageDataEncoder
+import gcloud.scala.pubsub.PubsubMessage.MessageDataEncoder
 import org.threeten.bp.Duration
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 import scala.language.implicitConversions
@@ -20,15 +19,15 @@ package object pubsub {
   import FutureConversions._
 
   /**
-    * Implicitly converts a string to a [[ProjectName]] by calling [[ProjectName.apply()]].
+    * Implicitly converts a string to a [[v1.ProjectName]] by calling [[ProjectName.apply()]].
     *
     * @param name the name
-    * @return the [[ProjectName]]
+    * @return the [[v1.ProjectName]]
     */
   implicit def projectFromString(name: String): ProjectName = ProjectName(name)
 
   /**
-    * Implicitly convert a [[ProjectName]] to [[String]].
+    * Implicitly convert a [[v1.ProjectName]] to [[String]].
     *
     * @param projectName the project name
     * @return the name of the project
@@ -36,15 +35,15 @@ package object pubsub {
   implicit def projectToString(projectName: ProjectName): String = projectName.toString
 
   /**
-    * Implicitly converts a string to a [[ProjectTopicName]] by calling [[ProjectTopicName.apply()]].
+    * Implicitly converts a string to a [[v1.ProjectTopicName]] by calling [[ProjectTopicName.apply()]].
     *
     * @param fullName the full name
-    * @return the [[ProjectTopicName]]
+    * @return the [[v1.ProjectTopicName]]
     */
   implicit def topicFromString(fullName: String): ProjectTopicName = ProjectTopicName(fullName)
 
   /**
-    * Implicitly convert a [[ProjectTopicName]] to [[String]].
+    * Implicitly convert a [[v1.ProjectTopicName]] to [[String]].
     *
     * @param topicName the topic name
     * @return the full name of the topic
@@ -52,20 +51,26 @@ package object pubsub {
   implicit def topicToString(topicName: ProjectTopicName): String = topicName.fullName
 
   implicit class TopicNameExtensions(val topicName: ProjectTopicName) extends AnyVal {
+
+    /**
+      * The full name of the topic. (projects/[project]/topics/[topic-name])
+      *
+      * @return the full topic name
+      */
     def fullName: String = topicName.toString
   }
 
   /**
-    * Implicitly converts a string to a [[ProjectSubscriptionName]] by calling [[ProjectSubscriptionName.apply()]].
+    * Implicitly converts a string to a [[v1.ProjectSubscriptionName]] by calling [[ProjectSubscriptionName.apply()]].
     *
     * @param fullName the full name
-    * @return the [[ProjectSubscriptionName]]
+    * @return the [[v1.ProjectSubscriptionName]]
     */
   implicit def subscriptionFromString(fullName: String): ProjectSubscriptionName =
     ProjectSubscriptionName(fullName)
 
   /**
-    * Implicitly convert a [[ProjectSubscriptionName]] to [[String]].
+    * Implicitly convert a [[v1.ProjectSubscriptionName]] to [[String]].
     *
     * @param subscriptionName the subscription name
     * @return the full name of the subscription
@@ -75,6 +80,12 @@ package object pubsub {
 
   implicit class SubscriptionNameExtensions(val subscriptionName: v1.ProjectSubscriptionName)
       extends AnyVal {
+
+    /**
+      * The full name of the subscription. (projects/[project]/subscriptions/[subscription-name])
+      *
+      * @return the full subscription name
+      */
     def fullName: String = subscriptionName.toString
   }
 
@@ -85,26 +96,6 @@ package object pubsub {
   implicit def topicAdminSettingsBuilderToInstance(
       builder: gcv1.TopicAdminSettings.Builder
   ): gcv1.TopicAdminSettings = builder.build()
-
-  implicit class ListTopicResponseExtensions(val listTopicsResponse: ListTopicsResponse)
-      extends AnyVal {
-    def topics: Seq[Topic] = listTopicsResponse.getTopicsList.asScala
-  }
-
-  implicit class ListTopicSubscriptionsResponseExtensions(
-      val listTopicSubscriptionsResponse: ListTopicSubscriptionsResponse
-  ) extends AnyVal {
-    def subscriptions: Seq[ProjectSubscriptionName] =
-      v1.ProjectSubscriptionName
-        .parseList(listTopicSubscriptionsResponse.getSubscriptionsList)
-        .asScala
-  }
-
-  implicit class ListSubscriptionsResponseExtensions(
-      val listSubscriptionsResponse: ListSubscriptionsResponse
-  ) extends AnyVal {
-    def subscriptions: Seq[Subscription] = listSubscriptionsResponse.getSubscriptionsList.asScala
-  }
 
   implicit class PublisherExtensions(val publisher: gcv1.Publisher) extends AnyVal {
     def publishAsync[T](message: T)(implicit converter: T => PubsubMessage): Future[String] =
@@ -126,9 +117,9 @@ package object pubsub {
     InstantiatingChannelProviderBuilder(builder)
 
   implicit val stringToPubSubMessageConverter: String => PubsubMessage = (value: String) =>
-    PubsubMessage.newBuilder().setData(ByteString.copyFromUtf8(value)).build()
+    v1.PubsubMessage.newBuilder().setData(ByteString.copyFromUtf8(value)).build()
 
-  implicit val pubSubMessageToPubSubMessageConverter: PubsubMessage.Builder => PubsubMessage =
+  implicit val pubSubMessageToPubSubMessageConverter: v1.PubsubMessage.Builder => PubsubMessage =
     builder => builder.build()
 
   type MessageDataDecoder[T] = ByteString => T

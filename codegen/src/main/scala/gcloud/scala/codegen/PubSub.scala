@@ -2,6 +2,11 @@ package gcloud.scala.codegen
 
 import java.util.regex.Pattern
 
+import com.google.cloud.pubsub.v1.SubscriptionAdminClient.ListSubscriptionsPagedResponse
+import com.google.cloud.pubsub.v1.TopicAdminClient.{
+  ListTopicSubscriptionsPagedResponse,
+  ListTopicsPagedResponse
+}
 import com.google.cloud.pubsub.v1.stub.{
   PublisherStub,
   PublisherStubSettings,
@@ -14,7 +19,12 @@ import com.google.cloud.pubsub.v1.{
   TopicAdminClient,
   TopicAdminSettings
 }
-import com.google.iam.v1.{GetIamPolicyRequest, SetIamPolicyRequest, TestIamPermissionsRequest}
+import com.google.iam.v1.{
+  GetIamPolicyRequest,
+  SetIamPolicyRequest,
+  TestIamPermissionsRequest,
+  TestIamPermissionsResponse
+}
 import com.google.pubsub.v1._
 import gcloud.scala.codegen.Builder.generateCompanion
 import gcloud.scala.codegen.Clients._
@@ -57,7 +67,16 @@ object PubSub {
                                        additionalTopicAdminDefs),
               generateStubExtensions(classOf[PublisherStub], Seq(classOf[Topic])),
               generateStubExtensions(classOf[SubscriberStub], Seq(classOf[Subscription])),
-              generateResponseSyntax(classOf[PullResponse], ResponseIgnores)
+              generateResponseSyntax(classOf[PullResponse], ResponseIgnores),
+              generateResponseSyntax(classOf[SeekResponse], ResponseIgnores),
+              generateResponseSyntax(classOf[TestIamPermissionsResponse], ResponseIgnores),
+              generateResponseSyntax(classOf[PublishResponse], ResponseIgnores),
+              generateResponseSyntax(classOf[ListTopicsResponse], ResponseIgnores),
+              generateResponseSyntax(classOf[ListTopicsPagedResponse], ResponseIgnores),
+              generateResponseSyntax(classOf[ListSubscriptionsResponse], ResponseIgnores),
+              generateResponseSyntax(classOf[ListSubscriptionsPagedResponse], ResponseIgnores),
+              generateResponseSyntax(classOf[ListTopicSubscriptionsResponse], ResponseIgnores),
+              generateResponseSyntax(classOf[ListTopicSubscriptionsPagedResponse], ResponseIgnores)
             ),
             generateStubObject(classOf[PublisherStub],
                                classOf[PublisherStubSettings],

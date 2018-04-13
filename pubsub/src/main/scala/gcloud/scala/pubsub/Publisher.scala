@@ -3,7 +3,6 @@ package gcloud.scala.pubsub
 import com.google.api.gax.core.CredentialsProvider
 import com.google.cloud.pubsub.v1.{Publisher => GCloudPublisher}
 import com.google.pubsub.v1
-import com.google.pubsub.v1.PubsubMessage
 
 import scala.concurrent.Future
 
@@ -33,7 +32,7 @@ object Publisher {
     import FutureConversions.Implicits._
 
     def publishAsync[T](publisher: GCloudPublisher,
-                        message: T)(implicit converter: T => PubsubMessage): Future[String] =
+                        message: T)(implicit converter: T => v1.PubsubMessage): Future[String] =
       publisher.publish(converter(message))
   }
 }

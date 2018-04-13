@@ -26,7 +26,7 @@ class PublisherSpec
 
       try {
         publisher.publishAsync("Test1")
-        publisher.publishAsync(PubSubMessage("Test2"))
+        publisher.publishAsync(PubsubMessage("Test2"))
 
         pullMessages(settings, 2).map(_.getData.toStringUtf8) should contain only ("Test1", "Test2")
       } finally {
