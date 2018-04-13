@@ -39,7 +39,7 @@ class TopicAdminClientSpec
     "get non existing topic" in {
       val (project, _, _) = newTestSetup()
 
-      topicAdminClient.getTopicOptionAsync(TopicName(project, "doesnotexit")).futureValue shouldBe None
+      topicAdminClient.getTopicOptionAsync(ProjectTopicName(project, "doesnotexit")).futureValue shouldBe None
     }
 
     "delete topic" in {

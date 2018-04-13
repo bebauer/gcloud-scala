@@ -70,6 +70,10 @@ private[pubsub] class FixedAutoClosableChannelProviderBuilder(host: String, port
       override def needsExecutor(): Boolean = provider.needsExecutor()
 
       override def needsEndpoint(): Boolean = provider.needsEndpoint()
+
+      override def acceptsPoolSize(): Boolean = provider.acceptsPoolSize()
+
+      override def withPoolSize(size: Int): TransportChannelProvider = provider.withPoolSize(size)
     }
 
   override def executorProvider(

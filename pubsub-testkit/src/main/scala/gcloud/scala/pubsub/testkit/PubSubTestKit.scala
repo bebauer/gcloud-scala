@@ -19,7 +19,7 @@ import scala.util.Try
 trait PubSubTestKit extends BeforeAndAfterAll {
   this: Suite with PubSubEmulator =>
 
-  type PubSubTestSettings = (v1.ProjectName, v1.TopicName, v1.SubscriptionName)
+  type PubSubTestSettings = (v1.ProjectName, v1.ProjectTopicName, v1.ProjectSubscriptionName)
 
   implicit val executionContext: ExecutionContextExecutor =
     scala.concurrent.ExecutionContext.global
@@ -59,8 +59,8 @@ trait PubSubTestKit extends BeforeAndAfterAll {
 
   def newTestSetup(): PubSubTestSettings = {
     val project      = ProjectName(s"test-${UUID.randomUUID().toString}")
-    val topic        = TopicName(project, "top")
-    val subscription = SubscriptionName(project, "subs")
+    val topic        = ProjectTopicName(project, "top")
+    val subscription = ProjectSubscriptionName(project, "subs")
 
     Await.ready(topicAdminClient.createTopicAsync(Topic(topic)), createTimeout)
     Await.ready(subscriptionAdminClient.createSubscriptionAsync(Subscription(subscription, topic)),

@@ -36,44 +36,44 @@ package object pubsub {
   implicit def projectToString(projectName: ProjectName): String = projectName.toString
 
   /**
-    * Implicitly converts a string to a [[TopicName]] by calling [[TopicName.apply()]].
+    * Implicitly converts a string to a [[ProjectTopicName]] by calling [[ProjectTopicName.apply()]].
     *
     * @param fullName the full name
-    * @return the [[TopicName]]
+    * @return the [[ProjectTopicName]]
     */
-  implicit def topicFromString(fullName: String): TopicName = TopicName(fullName)
+  implicit def topicFromString(fullName: String): ProjectTopicName = ProjectTopicName(fullName)
 
   /**
-    * Implicitly convert a [[TopicName]] to [[String]].
+    * Implicitly convert a [[ProjectTopicName]] to [[String]].
     *
     * @param topicName the topic name
     * @return the full name of the topic
     */
-  implicit def topicToString(topicName: TopicName): String = topicName.fullName
+  implicit def topicToString(topicName: ProjectTopicName): String = topicName.fullName
 
-  implicit class TopicNameExtensions(val topicName: TopicName) extends AnyVal {
+  implicit class TopicNameExtensions(val topicName: ProjectTopicName) extends AnyVal {
     def fullName: String = topicName.toString
   }
 
   /**
-    * Implicitly converts a string to a [[SubscriptionName]] by calling [[SubscriptionName.apply()]].
+    * Implicitly converts a string to a [[ProjectSubscriptionName]] by calling [[ProjectSubscriptionName.apply()]].
     *
     * @param fullName the full name
-    * @return the [[SubscriptionName]]
+    * @return the [[ProjectSubscriptionName]]
     */
-  implicit def subscriptionFromString(fullName: String): SubscriptionName =
-    SubscriptionName(fullName)
+  implicit def subscriptionFromString(fullName: String): ProjectSubscriptionName =
+    ProjectSubscriptionName(fullName)
 
   /**
-    * Implicitly convert a [[SubscriptionName]] to [[String]].
+    * Implicitly convert a [[ProjectSubscriptionName]] to [[String]].
     *
     * @param subscriptionName the subscription name
     * @return the full name of the subscription
     */
-  implicit def subscriptionToString(subscriptionName: SubscriptionName): String =
+  implicit def subscriptionToString(subscriptionName: ProjectSubscriptionName): String =
     subscriptionName.fullName
 
-  implicit class SubscriptionNameExtensions(val subscriptionName: v1.SubscriptionName)
+  implicit class SubscriptionNameExtensions(val subscriptionName: v1.ProjectSubscriptionName)
       extends AnyVal {
     def fullName: String = subscriptionName.toString
   }
@@ -94,8 +94,10 @@ package object pubsub {
   implicit class ListTopicSubscriptionsResponseExtensions(
       val listTopicSubscriptionsResponse: ListTopicSubscriptionsResponse
   ) extends AnyVal {
-    def subscriptions: Seq[SubscriptionName] =
-      v1.SubscriptionName.parseList(listTopicSubscriptionsResponse.getSubscriptionsList).asScala
+    def subscriptions: Seq[ProjectSubscriptionName] =
+      v1.ProjectSubscriptionName
+        .parseList(listTopicSubscriptionsResponse.getSubscriptionsList)
+        .asScala
   }
 
   implicit class ListSubscriptionsResponseExtensions(

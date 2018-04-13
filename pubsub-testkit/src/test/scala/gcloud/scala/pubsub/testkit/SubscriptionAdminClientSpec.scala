@@ -27,7 +27,7 @@ class SubscriptionAdminClientSpec
     "create a subscription" in {
       val (project, topic, _) = newTestSetup()
 
-      val subscriptionName = SubscriptionName(project, "testSubscription")
+      val subscriptionName = ProjectSubscriptionName(project, "testSubscription")
       val subscription     = Subscription(subscriptionName, topic)
 
       whenReady(subscriptionAdminClient.createSubscriptionAsync(subscription)) { result =>
@@ -49,7 +49,7 @@ class SubscriptionAdminClientSpec
       val (project, _, _) = newTestSetup()
 
       subscriptionAdminClient
-        .getSubscriptionOptionAsync(SubscriptionName(project, "doesnotexist"))
+        .getSubscriptionOptionAsync(ProjectSubscriptionName(project, "doesnotexist"))
         .futureValue shouldBe None
     }
 

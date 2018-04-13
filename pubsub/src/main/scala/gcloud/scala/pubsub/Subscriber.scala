@@ -17,12 +17,12 @@ object Subscriber {
   type MessageReceiverType = (PubsubMessage, AckReplyConsumer) => Unit
 
   def apply(
-      subscriptionName: v1.SubscriptionName
+      subscriptionName: v1.ProjectSubscriptionName
   )(receiver: MessageReceiverType): GCloudSubscriber =
     Builder(subscriptionName, MessageReceiverWrapper(receiver))
 
   def apply(
-      subscriptionName: v1.SubscriptionName,
+      subscriptionName: v1.ProjectSubscriptionName,
       pubSubUrl: PubSubUrl = PubSubUrl.DefaultPubSubUrl,
       credentialsProvider: CredentialsProvider =
         com.google.cloud.pubsub.v1.SubscriptionAdminSettings.defaultCredentialsProviderBuilder.build,
@@ -33,7 +33,7 @@ object Subscriber {
       .setCredentialsProvider(credentialsProvider)
 
   object Builder {
-    def apply(subscriptionName: v1.SubscriptionName,
+    def apply(subscriptionName: v1.ProjectSubscriptionName,
               receiver: MessageReceiver): GCloudSubscriber.Builder =
       GCloudSubscriber.newBuilder(subscriptionName, receiver)
 
