@@ -113,13 +113,17 @@ trait PubSubTestKit extends BeforeAndAfterAll {
         if (System.nanoTime() - lastUpdate > 1.second.toNanos) {
           cancel = true
         } else {
-          messages ++= Await
+          val pulledMessages = Await
             .result(subscriber.pullAsync(maxMessages = amount,
                                          returnImmediately = true,
                                          subscription = subscription),
                     10.seconds)
             .receivedMessages
-          lastUpdate = System.nanoTime()
+
+          if (pulledMessages.nonEmpty) {
+            messages ++= pulledMessages
+            lastUpdate = System.nanoTime()
+          }
         }
       }
 
