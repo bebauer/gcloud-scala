@@ -22,7 +22,7 @@ class PublisherSpec
       val settings      = newTestSetup()
       val (_, topic, _) = settings
 
-      val publisher = Publisher(topic, pubSubUrl, new NoCredentialsProvider())
+      val publisher = Publisher(topic, pubSubUrl, NoCredentialsProvider.create())
 
       try {
         publisher.publishAsync("Test1")

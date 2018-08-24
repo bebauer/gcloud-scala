@@ -1,12 +1,13 @@
 package gcloud.scala.pubsub.testkit
 
-import org.scalatest.{Matchers, WordSpec}
-import org.scalatest.concurrent.ScalaFutures
+import com.google.api.gax.core.NoCredentialsProvider
 import gcloud.scala.pubsub._
 import gcloud.scala.pubsub.syntax._
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{Matchers, WordSpec}
 
-import scala.concurrent.{Await, ExecutionContextExecutor}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContextExecutor}
 
 class SubscriberStubSpec
     extends WordSpec
@@ -18,14 +19,14 @@ class SubscriberStubSpec
   override implicit val executionContext: ExecutionContextExecutor =
     scala.concurrent.ExecutionContext.global
 
-  "SubscrierStub" should {
+  "SubscriberStub" should {
     "pull messages" in {
-      val settings                       = newTestSetup()
-      val (project, topic, subscription) = settings
+      val settings             = newTestSetup()
+      val (_, _, subscription) = settings
 
       publishMessages(settings, "1", "2", "3")
 
-      val stub = SubscriberStub(pubSubUrl)
+      val stub = SubscriberStub(pubSubUrl, NoCredentialsProvider.create())
 
       val response = Await.result(
         stub.pullAsync(

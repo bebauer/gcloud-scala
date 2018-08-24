@@ -19,7 +19,7 @@ class TopicAdminClientSpec
   override implicit val executionContext: ExecutionContextExecutor =
     scala.concurrent.ExecutionContext.global
 
-  override implicit val patienceConfig =
+  override implicit val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = Span(60, Seconds), interval = Span(500, Millis))
 
   "The TopicAdminClient" should {
@@ -54,7 +54,7 @@ class TopicAdminClientSpec
       val (_, topic, subscription) = newTestSetup()
 
       topicAdminClient.listTopicSubscriptionsAsync(topic = topic).futureValue.subscriptions should contain(
-        subscription
+        subscription.fullName
       )
     }
   }

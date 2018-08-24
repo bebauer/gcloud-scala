@@ -24,7 +24,7 @@ private[pubsub] class FixedAutoClosableChannelProviderBuilder(host: String, port
     extends ChannelProviderBuilder {
   private val channelBuilder = ManagedChannelBuilder
     .forAddress(host, port)
-    .usePlaintext(true)
+    .usePlaintext()
 
   override def keepAliveTimeout(keepAliveTimeout: Duration): ChannelProviderBuilder = {
     channelBuilder.keepAliveTimeout(keepAliveTimeout.toNanos, TimeUnit.NANOSECONDS)

@@ -72,6 +72,14 @@ object Stubs {
       (DEF("apply", stubClass.getName) withParams PARAM("url", "PubSubUrl").tree := REF(
         stubClass.getSimpleName
       ) APPLY (REF("url") withType "Settings")) +:
+      (DEF("apply", stubClass.getName) withParams (PARAM("url", "PubSubUrl").tree, PARAM(
+        "credentialsProvider",
+        "com.google.api.gax.core.CredentialsProvider"
+      ).tree) := REF(
+        stubClass.getSimpleName
+      ) APPLY (REF("url") withType "Settings" DOT "copy" APPLY (REF("credentialsProvider") := REF(
+        "credentialsProvider"
+      )))) +:
       (DEF("apply", stubClass.getName) withParams (PARAM(
         "settings",
         settingsClass.getName.asScalaClass

@@ -31,7 +31,7 @@ class SubscriberSpec
 
       implicit val stringDecoder: MessageDataDecoder[String] = _.toStringUtf8
 
-      val subscriber = Subscriber(subscription, pubSubUrl, new NoCredentialsProvider()) {
+      val subscriber = Subscriber(subscription, pubSubUrl, NoCredentialsProvider.create()) {
         (message, consumer) =>
           println(message.dataAs[String])
           messages += message.dataAs[String]
@@ -42,7 +42,7 @@ class SubscriberSpec
 
       publishMessages(settings, "TEST1", "TEST2", "TEST3") should have size 3
 
-      implicit val patienceConfig = PatienceConfig(10.seconds, 500.milliseconds)
+      implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds, 500.milliseconds)
 
       eventually {
         messages should contain only ("TEST1", "TEST2", "TEST3")

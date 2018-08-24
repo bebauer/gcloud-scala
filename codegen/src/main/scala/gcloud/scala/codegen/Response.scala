@@ -37,6 +37,14 @@ object Response {
           DEF(method.getName.substring(3, method.getName.length - 4).firstToLower, "Seq[String]") := REF(
             response
           ) DOT method.getName DOT "asScala"
+        case method
+            if isNotIgnored(ignoreMethods, method) && method.getName
+              .startsWith("get") && method.getName
+              .endsWith("List") && method.getReturnType == classOf[java.util.List[_]] =>
+          // Check for java.util.List here because reflection return ProtocolStringList as such
+          DEF(method.getName.substring(3, method.getName.length - 4).firstToLower, "Seq[String]") := REF(
+            response
+          ) DOT method.getName DOT "asScala"
       }
 
     if (defs.nonEmpty)

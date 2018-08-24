@@ -31,7 +31,7 @@ trait PubSubTestKit extends BeforeAndAfterAll {
     SubscriptionAdminClient(
       SubscriptionAdminClient
         .Settings(pubSubUrl)
-        .copy(credentialsProvider = new NoCredentialsProvider())
+        .copy(credentialsProvider = NoCredentialsProvider.create())
     )
   }
   def subscriptionAdminClient = subscriptionAdminClientLazy()
@@ -40,7 +40,7 @@ trait PubSubTestKit extends BeforeAndAfterAll {
     TopicAdminClient(
       TopicAdminClient
         .Settings(pubSubUrl)
-        .copy(credentialsProvider = new NoCredentialsProvider())
+        .copy(credentialsProvider = NoCredentialsProvider.create())
     )
   }
   def topicAdminClient = topicAdminClientLazy()
@@ -76,7 +76,7 @@ trait PubSubTestKit extends BeforeAndAfterAll {
     val publisher = PublisherStub(
       PublisherStub
         .Settings(pubSubUrl)
-        .copy(credentialsProvider = new NoCredentialsProvider())
+        .copy(credentialsProvider = NoCredentialsProvider.create())
     )
 
     try {
@@ -100,7 +100,7 @@ trait PubSubTestKit extends BeforeAndAfterAll {
     val subscriber = SubscriberStub(
       SubscriberStub
         .Settings(pubSubUrl)
-        .copy(credentialsProvider = new NoCredentialsProvider())
+        .copy(credentialsProvider = NoCredentialsProvider.create())
     )
 
     try {

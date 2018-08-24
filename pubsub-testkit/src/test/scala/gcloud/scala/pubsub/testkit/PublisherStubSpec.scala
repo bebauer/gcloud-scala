@@ -1,5 +1,6 @@
 package gcloud.scala.pubsub.testkit
 
+import com.google.api.gax.core.NoCredentialsProvider
 import gcloud.scala.pubsub._
 import gcloud.scala.pubsub.syntax._
 import org.scalatest.concurrent.ScalaFutures
@@ -23,7 +24,7 @@ class PublisherStubSpec
       val settings      = newTestSetup()
       val (_, topic, _) = settings
 
-      val stub = PublisherStub(pubSubUrl)
+      val stub = PublisherStub(pubSubUrl, NoCredentialsProvider.create())
 
       try {
         Await.ready(
