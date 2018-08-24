@@ -24,6 +24,8 @@ before_cache:
 
 deploy:
   provider: releases
+  api_key:
+    secure: "Q2UnIFgqSsHTHeQ2TGZ8CT42O2C0ZehwOjNdX63lE8BJpQgLRxTsDXIz30tmgKFCZZEWJcPaAspH8ZeGEEQGZ4cs835me0ANGnLMMif+cJfSez21Xrl50P3eDbiJezla3P7WWEs95ljLEpSmR8fxGygMwLw+JIaiOVtTDScc6Up0k4VG5DCqu634G0Q7VadWjhcziVuD94sitCdFqI6jvv4ESjTyRvNX3TC8BxsV/tuHoaQejbOrFVLXllwQg2gdJERiy3D+VXUpo6ocSeKmG5n9qDO4WpOaJZ2IWtJmc51UMjZwmloOkvJBP/AKqkbwpxLOiLN3cktlyQW04WI8nU8ihL2AAlxzqprUCZdolJ1hD7J5hHymLZTWYqFWgWnd7088jELirJQ1F3jeK6KwGVUixH9xuBRfKharGNWKkJYP+OyGJPPJc5UCy0gXyg1JlzbiCPAO6udj+/uXK513EjWbnsbTFU9CTNZI3yZc2wF8MK6m19d6rREHwhQoIFBsvUbl6Dm6cROigsojUvmihh8QbwkNPe7uDpmv5ES8nBkOcRPLd0WNecHK9NVLKOXuhODOtkXjuR5qN1bObpgjwlvxUSYcbbqsgWcFfgx6SFWU10o8ofefzMYdkWp3/enJjXW/D7fIrtzi2oswRm5Aimr0bJifBONe9xWmItZQJAU="
   file:
     - pubsub/target/scala-*/*.jar
     - pubsub-testkit/target/scala-*/*.jar
