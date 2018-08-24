@@ -6,8 +6,8 @@ services:
   - docker
 
 scala:
-  - 2.11.11
-  - 2.12.4
+  - 2.11.12
+  - 2.12.6
 
 cache:
   directories:
@@ -15,9 +15,18 @@ cache:
     - $HOME/.sbt
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION test
+  - sbt ++$TRAVIS_SCALA_VERSION test package
 
 before_cache:
   # Cleanup the cached directories to avoid unnecessary cache updates
   - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
   - find $HOME/.sbt        -name "*.lock"               -print -delete
+
+deploy:
+  provider: releases
+  file:
+    - pubsub/target/scala-*/*.jar
+    - pubsub-testkit/target/scala-*/*.jar
+  skip_cleanup: true
+  on:
+    tags: true

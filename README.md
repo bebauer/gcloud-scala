@@ -21,8 +21,8 @@ resolvers += Resolver.bintrayRepo("bebauer", "maven")
 // Add dependencies
 
 // Pub/Sub
-"gcloud-scala" %% "gcloud-scala-pubsub" % "0.2.0"
-"gcloud-scala" %% "gcloud-scala-pubsub-testkit" % "0.2.0" % Test
+"gcloud-scala" %% "gcloud-scala-pubsub" % "version"
+"gcloud-scala" %% "gcloud-scala-pubsub-testkit" % "version" % Test
 ```
 
 ## Imports
